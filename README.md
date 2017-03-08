@@ -165,7 +165,7 @@ render() {
  * The module auto-selects the number of ticks, if not specified
 
 * `yScale`
- * Options: `"linear"`,`"logarithmic"
+ * Options: `"linear"`,`"log"`
  * Default: `"linear"` 
  * Sets the scaling of y-axis
 

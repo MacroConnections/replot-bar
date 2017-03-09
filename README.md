@@ -9,31 +9,15 @@ Intelligent and customizable bar graph components for React projects.
 
 #### Basic Bar Graph
 
-You can supply the data as a list of [x_value, y_value] where x_value is number or string and y_value is number
+You can supply the data as array of JSON objects. 
 
 ```javascript
 render() {
-	let populations = [
-		["China",1388232693],
-		["India",1342512706],
-		["USA",326474013]
-	]
-
-	return(
-		<BarGraph data={populations} />
-	)
-}
-```
-
-You can also supply the data in JSON format
-
-```javascript
-render() {
-  let populations = {
+  let populations = [
     {country: "China", population: 1388232693},
     {country: "India", population: 1342512706},
     {country: "USA", population: 326474013},
-  }
+  ]
 
   return(
     <BarGraph data={populations} xKey="country" 
@@ -43,8 +27,8 @@ render() {
 ```
 
 - `data` is the only required property
-- `xKey` defaults to `"label"`
-- `yKey` defaults to `"value"`
+- `xKey` defaults to `"xValue"`. X-value of bar graph is number or string.
+- `yKey` defaults to `"yValue"`. Y-value of bar graph is number.
 
 #### Group Bar Graph
 
@@ -52,18 +36,20 @@ You can supply the group (number or string) as key and the data as lists of [x_v
 
 ```javascript
 render() {
-	let populations = {
-		"China":[
-			[1980,981200000],
-			[1990,1135000000],
-			[2000,1263000000]
-		],
-		"India":[
-			[1980,699000000],
-			[1990,868900000],
-			[2000,1042000000]			
-		]
-	}
+  let populations = [
+    {country: "China", population: [
+        {year: 1980, count: 981200000}, 
+        {year: 1990, count: 1135000000}, 
+        {year: 2000, count: 1263000000}
+      ]
+    },
+    {country: "India", [
+        {year: 1980, count: 699000000}, 
+        {year: 1990, count: 868900000}, 
+        {year: 2000, count: 1042000000}
+      ]
+    }
+  ]
 
 	return(
 		<BarGraph data={populations} />

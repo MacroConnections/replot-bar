@@ -17,12 +17,12 @@ render() {
     {country: "China", population: 1388232693},
     {country: "India", population: 1342512706},
     {country: "USA", population: 326474013},
-  ]
+  ];
 
   return(
     <BarGraph data={populations} xKey="country" 
     yKey="population"/>
-  )
+  );
 }
 ```
 
@@ -37,24 +37,18 @@ You can supply the data as array of JSON objects.
 ```javascript
 render() {
   let populations = [
-    {country: "China", population: [
-        {year: 1980, count: 981200000}, 
-        {year: 1990, count: 1135000000}, 
-        {year: 2000, count: 1263000000}
-      ]
-    },
-    {country: "India", [
-        {year: 1980, count: 699000000}, 
-        {year: 1990, count: 868900000}, 
-        {year: 2000, count: 1042000000}
-      ]
-    }
-  ]
-
+    {country: "China", year: 1980, count: 981200000}, 
+    {country: "China", year: 1990, count: 1135000000}, 
+    {country: "China", year: 2000, count: 1263000000},
+    {country: "India", year: 1980, count: 699000000}, 
+    {country: "India", year: 1990, count: 868900000}, 
+    {country: "India", year: 2000, count: 1042000000}
+  ];
+	
 	return(
 		<BarGraph data={populations} xKey="year" yKey="count" 
-    groupKey="country"/>
-	)
+		groupKey="country"/>
+	);
 }
 ```
 
@@ -69,6 +63,27 @@ render() {
  * Default: Auto-generated color palette
  * Fills the bars with the iteration of colors, if an array is specified
  * Fills the bars with the output colors, if a function is specified 
+
+##### Example: Array of hex colors
+```javascript
+let colors = ["#2ecc71","#1abc9c","#16a085"];
+<BarGraph data={data} color={colors}>
+```
+##### Example: Function of x, y, group values to hex color
+```javascript
+function coloring(x, y, group) {
+	if (group === "GroupA") {
+		if (x > 10 && y > 10) {
+			return "#2980b9";
+		} else {
+			return "#2c3e50";
+		}
+	} else {
+		return "#95a5a6";
+	}
+}
+<BarGraph data={data} color={coloring}>
+```
 
 ### Future Implementation
 

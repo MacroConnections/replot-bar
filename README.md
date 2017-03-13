@@ -9,134 +9,104 @@ Intelligent and customizable bar graph components for React projects.
 
 #### Basic Bar Graph
 
-You can supply the data as a list of [x_value, y_value] where x_value is number or string and y_value is number
+You can supply the data as array of JSON objects. 
 
 ```javascript
 render() {
-	let populations = [
-		["China",1388232693],
-		["India",1342512706],
-		["USA",326474013]
-	]
-
-	return(
-		<BarGraph data={populations} />
-	)
-}
-```
-
-You can also supply the data in JSON format
-
-```javascript
-render() {
-  let populations = {
+  let populations = [
     {country: "China", population: 1388232693},
     {country: "India", population: 1342512706},
     {country: "USA", population: 326474013},
-  }
+  ];
 
   return(
     <BarGraph data={populations} xKey="country" 
     yKey="population"/>
-  )
+  );
 }
 ```
 
 - `data` is the only required property
-- `xKey` defaults to `"label"`
-- `yKey` defaults to `"value"`
+- `xKey` defaults to `"x"`. X-value of bar graph is number or string.
+- `yKey` defaults to `"y"`. Y-value of bar graph is number.
 
 #### Group Bar Graph
 
-You can supply the group (number or string) as key and the data as lists of [x_value, y_value]
+You can supply the data as array of JSON objects. 
 
 ```javascript
 render() {
-	let populations = {
-		"China":[
-			[1980,981200000],
-			[1990,1135000000],
-			[2000,1263000000]
-		],
-		"India":[
-			[1980,699000000],
-			[1990,868900000],
-			[2000,1042000000]			
-		]
-	}
-
+  let populations = [
+    {country: "China", year: 1980, count: 981200000}, 
+    {country: "China", year: 1990, count: 1135000000}, 
+    {country: "China", year: 2000, count: 1263000000},
+    {country: "India", year: 1980, count: 699000000}, 
+    {country: "India", year: 1990, count: 868900000}, 
+    {country: "India", year: 2000, count: 1042000000}
+  ];
+	
 	return(
-		<BarGraph data={populations} />
-	)
+		<BarGraph data={populations} xKey="year" yKey="count" 
+		groupKey="country"/>
+	);
 }
 ```
 
-You can also supply the data in JSON format
+- `groupKey` defaults to `"group"`. Group of bar graph is number or string.
 
+### Customization
+
+#### Color
+
+* `color`
+ * Array of hex colors or Function of x, y, group values to hex color
+ * Default: Auto-generated color palette
+ * Fills the bars with the iteration of colors, if an array is specified
+ * Fills the bars with the output colors, if a function is specified 
+
+##### Example: Array of hex colors
 ```javascript
-render() {
-  let populations = {
-    {country: "China", population: [
-    		{year: 1980, count: 981200000}, 
-    		{year: 1990, count: 1135000000}, 
-    		{year: 2000, count: 1263000000}
-    	]
-    },
-    {country: "India", population: [
-    		{year: 1980, count: 699000000}, 
-    		{year: 1990, count: 868900000}, 
-    		{year: 2000, count: 1042000000}
-    	]
-    }
-  }
-
-  return(
-    <BarGraph data={populations} xKey="year" yKey="count" 
-    groupKey="country"/>
-  )
+let colors = ["#2ecc71","#1abc9c","#16a085"];
+<BarGraph data={data} color={colors}>
+```
+##### Example: Function of x, y, group values to hex color
+```javascript
+function coloring(x, y, group) {
+	if (group === "GroupA") {
+		if (x > 10 && y > 10) {
+			return "#2980b9";
+		} else {
+			return "#2c3e50";
+		}
+	} else {
+		return "#95a5a6";
+	}
 }
+<BarGraph data={data} color={coloring}>
 ```
 
-- `groupKey` defaults to `"group"`
+### Future Implementation
 
 #### Stacked Bar Graph
 
-You can supply the data as a list of [x_value, y_value_1, y_value_2 ...] and the keys (string) of stacks as a list of [key1, key2 ...] 
+You can supply the data as array of JSON objects. 
 
 ```javascript
 render() {
-	let populations = [
-		["China",697631073,658061503],
-		["India",641674319,594670312],
-		["USA",157082861,161809242]
-	]
-
-	let genders = ["male","female"]
-
-	return(
-		<BarGraph data={populations} stackKey={genders} />
-	)
-}
-```
-
-You can also supply the data in JSON format
-
-```javascript
-render() {
-  let populations = {
+  let populations = [
     {country: "China", population: {
-    		male: 697631073, female: 658061503
-  		}
+        male: 697631073, female: 658061503
+      }
     },
     {country: "India", population: {
-    		male: 641674319, female: 594670312
-  		}
+        male: 641674319, female: 594670312
+      }
     },
     {country: "USA", population: {
-    		male: 157082861, female: 161809242
-  		}
+        male: 157082861, female: 161809242
+      }
     }
-  }
+  ]
 
   let genders = ["male","female"]
 
@@ -148,8 +118,6 @@ render() {
 ```
 
 - `stackKey` defaults to `"stacks"`
-
-### Customization
 
 #### Layout
 
@@ -240,10 +208,6 @@ render() {
  * Options: `"none"`,`"sequential"`,`"diverging"`,`"constant"`,`"gradient"` 
  * Default: `"none"`
  * Sets the effect of bar coloring
-
-* `color`
- * Optional list of colors in hex codes
- * If specified, fills the bars with the iteration of colors 
 
 #### Legend
 

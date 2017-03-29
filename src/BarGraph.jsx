@@ -1,149 +1,236 @@
 import React from "react"
 //import {spring, Motion} from "react-motion"
 
-function greenDefault(x,y,group,i) {
-  let palette = ["#16a085","#2ecc71"];
-  return palette[i%palette.length];
+let greenPalette = ["#3498db","#16a085","#1abc9c","#2ecc71"]
+
+function green(x,y,group,i) {
+  return greenPalette[i%greenPalette.length];
 }
 
-let greenPalette = ["#16a085","#2ecc71"];
-
-const Bar = ({x,y,w,h,c}) => {
-  return (<rect x={x} y={y} width={w} height={h} fill={c} />);
-}
-
-class Bars extends React.Component {
-  constructor(props) {
-    super(props);
+function groupTest(x,y,group,i) {
+  switch (group) {
+    case "China":
+      return "#e74c3c"
+    case "India":
+      return "#e67e22"
+    case "United States":
+      return "#f39c12"
+    default:
+      return "black"
   }
+}
+
+
+class Bar extends React.Component {
 
   render() {
-    let barW = this.props.graphW/this.props.data.length;
-    let padding = barW * 0.2;
+    return (<rect x={this.props.x} y={this.props.y}
+      width={this.props.width} height={this.props.height}
+      fill={this.props.color} />);
+  }
+}
 
-    if (typeof(this.props.color) === "function") {
-      const barRects = this.props.data.map((d,i) => {
-        var x=barW*i,
-          w=barW-padding,
-          h=d[this.props.yKey]*this.props.barScale,
-          y=this.props.graphH-h,
-          c=this.props.color(d[this.props.xKey],d[this.props.yKey],
-            d[this.props.groupKey],i);
-        return (<Bar x={x} y={y} w={w} h={h} c={c} />);
-      });
-      return (<g>{barRects}</g>);
 
+class XAxis extends React.Component {
+
+  render() {
+    return(
+      <line
+        x1={this.props.strokeWidth} y1={this.props.height}
+        x2={this.props.width} y2={this.props.height}
+        strokeWidth={this.props.strokeWidth} stroke={this.props.color}
+      />
+    )
+  }
+}
+
+XAxis.defaultProps = {
+  strokeWidth: 3,
+  color: "#1b1b1b",
+}
+
+
+class XLabel extends React.Component {
+
+  render() {
+    let rotation = "rotate(" + this.props.tilt + "," + this.props.x +
+      "," + this.props.y + ")"
+    return(
+      <text
+        x={this.props.x} y={this.props.y}
+        textAnchor="end" transform={rotation}
+        fill={this.props.color} fontFamily={this.props.fontFamily}>
+          {this.props.name}
+      </text>
+    )
+  }
+}
+
+XLabel.defaultProps = {
+  color: "#1b1b1b",
+  fontFamily: "Sans-Serif",
+  tilt: -65,
+}
+
+
+class YAxis extends React.Component {
+
+  render() {
+    return(
+      <line
+        x1={this.props.strokeWidth} y1="0"
+        x2={this.props.strokeWidth} y2={this.props.height}
+        strokeWidth={this.props.strokeWidth} stroke={this.props.color}
+      />
+    )
+  }
+}
+
+YAxis.defaultProps = {
+  strokeWidth: 3,
+  color: "#1b1b1b",
+}
+
+
+class YTick extends React.Component {
+
+  render() {
+    return(
+      <line
+        x1={0} y1={this.props.y}
+        x2={this.props.strokeWidth*2} y2={this.props.y}
+        strokeWidth={this.props.strokeWidth} stroke={this.props.color}
+      />
+    )
+  }
+}
+
+YTick.defaultProps = {
+  strokeWidth: 3,
+  color: "#1b1b1b",
+}
+
+
+class YLabel extends React.Component {
+
+  render() {
+    return(
+      <text
+        x="-5" y={this.props.y}
+        textAnchor="end" alignmentBaseline="middle"
+        fill={this.props.color} fontFamily={this.props.fontFamily}>
+          {this.props.value}
+      </text>
+    )
+  }
+}
+
+YLabel.defaultProps = {
+  color: "#1b1b1b",
+  fontFamily: "Sans-Serif",
+}
+
+
+class GridLine extends React.Component {
+
+  render() {
+    return(
+      <line
+        x1={this.props.strokeWidth} y1={this.props.y}
+        x2={this.props.width} y2={this.props.y}
+        strokeWidth={this.props.strokeWidth} stroke={this.props.color}
+      />
+    )
+  }
+}
+
+GridLine.defaultProps = {
+  strokeWidth: 3,
+  color: "#7f8c8d",
+}
+
+
+class Legend extends React.Component {
+
+  render() {
+    let titles = Object.keys(this.props.legend)
+    let rows = [];
+    for (var i=0; i<titles.length; i++) {
+      let title = titles[i]
+      if (title) {
+        let y = (i * 2 + 1) * this.props.size
+        let x = this.props.size
+        rows.push(
+          <g>
+            <rect x={x} y={y} width={x} height={x}
+              fill={this.props.legend[title]} />
+            <text x={3*x} y={y+(x/2)}
+              alignmentBaseline="middle" fontSize={x}
+              fontFamily={this.props.fontFamily}>
+                {title}
+            </text>
+          </g>
+        )
+      }
+    }
+
+    if (rows.length === 0) {
+      return null
     } else {
-      let palette = this.props.color;
-      const barRects = this.props.data.map((d,i) => {
-        var x=barW*i,
-          w=barW-padding,
-          h=d[this.props.yKey]*this.props.barScale,
-          y=this.props.graphH-h,
-          c=palette[i%palette.length];
-        return (<rect x={x} y={y} width={w} height={h} fill={c} />);
-      });
-      return (<g>{barRects}</g>);
+      let height = (titles.length * 2 + 1) * this.props.size
+      return(
+        <g>
+          <rect
+            x="0" y="0" width={this.props.width} height={height}
+            strokeWidth={this.props.strokeWidth}
+            stroke={this.props.strokeColor}
+            fill={this.props.background} />
+          {rows}
+        </g>
+      )
     }
   }
 }
 
-const XAxis = ({axisW,axisH}) => {
-  let strokeW=3, color="#1b1b1b";
-  return (<line x1={strokeW} y1={axisH} x2={axisW} y2={axisH}
-      strokeWidth={strokeW} stroke={color} />);
+Legend.defaultProps = {
+  size: 20,
+  width: 200,
+  fontColor: "#1b1b1b",
+  fontFamily: "Sans-Serif",
+  strokeColor: "#1b1b1b",
+  strokeWidth: 1,
+  background: "#ffffff",
 }
 
-const YAxis = ({axisW,axisH}) => {
-  let strokeW=3, color="#1b1b1b";
-  return (<line x1={strokeW} y1={0} x2={strokeW} y2={axisH}
-      strokeWidth={strokeW} stroke={color} />);
-}
-
-const YTicks = ({axisW,axisH,step}) => {
-  let strokeW=3, color="#1b1b1b";
-  const ticks = [];
-  for (var i=step; i<axisH; i=i+step) {
-     ticks.push(<line x1={0} y1={axisH-i} x2={strokeW*2} y2={axisH-i}
-                  strokeWidth={strokeW} stroke={color}/>);
-  }
-  return (<g>{ticks}</g>);
-}
-
-const GridLines = ({axisW,axisH,step}) => {
-  let strokeW=3, color="#7f8c8d";
-  const lines = [];
-  for (var i=step; i<axisH; i=i+step) {
-     lines.push(<line x1={strokeW} y1={axisH-i} x2={axisW} y2={axisH-i}
-                  strokeWidth={strokeW} stroke={color}/>);
-  }
-  return (<g>{lines}</g>);
-}
-
-const Axes = ({axisW,axisH,step}) => {
-  return (
-    <g>
-      <XAxis axisW={axisW} axisH={axisH} />
-      <YAxis axisW={axisW} axisH={axisH} />
-      <YTicks axisW={axisW} axisH={axisH} step={step} />
-    </g>
-  );
-}
-
-const XLabels = ({graphW,graphH,data,xKey}) => {
-  let barW = graphW/data.length;
-  let color = "#1b1b1b";
-  const labels = data.map((d,i) => {
-    let x=barW*(i+0.5), y=graphH+15;
-    return (<text x={x} y={y} textAnchor="end"
-            transform={"rotate(-65,"+x+","+y+")"}
-            fill={color} fontFamily={"Sans-Serif"}>{d[xKey]}</text>);
-    });
-  return (<g>{labels}</g>);
-}
-
-const YLabels = ({axisH,step,stepH}) => {
-  let color = "#34495e";
-  const labels = [];
-  for (var i=0; i*stepH<axisH; i++) {
-    var value = step*i;
-    if (Math.log10(value) > 3) {
-      value = value.toExponential();
-    }
-    labels.push(
-      <text x={-5} y={axisH-stepH*i} textAnchor="end" alignmentBaseline="middle"
-        fill={color} fontFamily={"Sans-Serif"}>{value}</text>);
-  }
-  return (<g>{labels}</g>);
-}
 
 class BarGraph extends React.Component {
   constructor(props) {
     super(props);
 
-    let xKey = this.props.xKey;
-    var isNumber = this.props.data.some(function(elt){
-      return (typeof(elt[xKey]) === "number");
-    });
+    let xKey = this.props.xKey
+    let isNumber = this.props.data.some(function(elt){
+      return (typeof(elt[xKey]) === "number")
+    })
     if (isNumber) {
       this.props.data.sort(function(a, b){
-        var aKey = a[xKey], bKey = b[xKey];
+        let aKey = a[xKey]
+        let bKey = b[xKey]
         if (aKey < bKey) {
-          return -1;
+          return -1
         } else if (aKey > bKey) {
-          return 1;
+          return 1
         } else {
-          return 0;
+          return 0
         }
-      });
+      })
     }
 
-    let graphW = Math.min(80*this.props.data.length,800);
-    let graphH = 400;
-    let margin = 25;
-    let axisW = graphW + (2 * margin);
-    let w = axisW + (2.5 * margin);
-    let h = graphH + (2 * margin);
+    let graphW = Math.min(80*this.props.data.length,800)
+    let graphH = 400
+    let margin = 25
+    let axisW = graphW + (2 * margin)
+    let w = axisW + (2.5 * margin)
+    let h = graphH + (5 * margin)
 
     this.state = {
       graphW: graphW,
@@ -152,45 +239,126 @@ class BarGraph extends React.Component {
       margin: margin,
       w: w,
       h: h,
+      legendW: 200,
+    }
+
+    this.legend = {}
+  }
+
+  colorBar(x,y,group,i) {
+    if (typeof(this.props.color) === "function") {
+      let color = this.props.color(x,y,group,i)
+      if (group) {
+        this.legend[group] = color
+      }
+      return color
+    } else {
+      let palette = this.props.color
+      if (this.props.groupKey) {
+        if (this.legend[group]) {
+          return this.legend[group]
+        } else {
+          let groups = Object.keys(this.legend)
+          let color = palette[groups.length%palette.length];
+          this.legend[group] = color
+          return color
+        }
+      } else {
+        return palette[i%palette.length]
+      }
     }
   }
 
   render() {
-    let maxY = 0;
-    for (var i=0; i<this.props.data.length; i++) {
+    let maxY = 0
+    for (var i = 0; i < this.props.data.length; i++) {
       if (this.props.data[i][this.props.yKey] > maxY) {
         maxY = this.props.data[i][this.props.yKey];
       }
     }
-    let barScale = this.state.graphH/(maxY*1.1);
+    let barScale = this.state.graphH / (maxY * 1.1);
 
-    let unit = 10**(Math.floor(Math.log10(maxY)));
-    let nearest = Math.ceil(maxY/unit);
-    let step = (unit/10)*nearest;
-    let stepH = step*barScale;
+    let unit = 10 ** (Math.floor(Math.log10(maxY)))
+    let nearest = Math.ceil(maxY/unit)
+    let step = (unit / 10) * nearest
+    let stepHeight = step * barScale
+
+    let barWidth = this.state.graphW/this.props.data.length
+    let padding = barWidth * 0.2;
+
+    let barRects = this.props.data.map((d,i) => {
+      let xVal = d[this.props.xKey]
+      let yVal = d[this.props.yKey]
+      let group = d[this.props.groupKey]
+      let width = barWidth - padding
+      let height = yVal * barScale
+      let barX = barWidth * i
+      let barY = this.state.graphH - height
+      let color = this.colorBar(xVal,yVal,group,i)
+      return(
+        <Bar
+          key={barX} x={barX} y={barY}
+          width={width} height={height} color={color} />
+      )
+    })
+
+    let xLabels = this.props.data.map((d,i) => {
+      let xLabelX = barWidth * (i + 0.5)
+      let xLabelY = this.state.graphH + 15
+      return(
+        <XLabel key={i} x={xLabelX} y={xLabelY} name={d[this.props.xKey]} />
+      )
+    })
+
+    let yLabels = []
+    for (var i = 0; i * stepHeight < this.state.graphH; i++) {
+      let yLabelY = this.state.graphH - (stepHeight * i)
+      let yLabelVal = step * i
+      if (Math.log10(yLabelVal) > 3) {
+        yLabelVal = yLabelVal.toExponential()
+      }
+      yLabels.push(
+        <YLabel key={yLabelY} y={yLabelY} value={yLabelVal} />
+      )
+    }
+
+    let yTicks = []
+    for (var i = stepHeight; i < this.state.graphH; i = i + stepHeight) {
+      let yTickY = this.state.graphH - i
+      yTicks.push(
+        <YTick key={yTickY} y={yTickY} />
+      )
+    }
+
+    let gridlines = []
+    for (var i = stepHeight; i < this.state.graphH; i = i + stepHeight) {
+      let gridY = this.state.graphH - i
+      gridlines.push(
+        <GridLine key={gridY} y={gridY} width={this.state.axisW} />
+      )
+    }
+
+    let barsShift = "translate(" + this.state.margin + ",0)"
+    let graphShift = "translate(" + (this.state.w - this.state.axisW) +
+      "," + this.state.margin + ")"
+    let legendShift = "translate(" + this.state.w + ",0)"
 
     return (
-      <svg width={this.state.w} height={this.state.w}>
-        <g transform={"translate("+(this.state.w-this.state.axisW)+","
-          +this.state.margin+")"}>
-          <GridLines axisW={this.state.axisW} axisH={this.state.graphH}
-            step={stepH} />
-          <g transform={"translate("+this.state.margin+",0)"}>
-            <Bars graphW={this.state.graphW} graphH={this.state.graphH}
-              barScale={barScale} data={this.props.data}
-              xKey={this.props.xKey} yKey={this.props.yKey}
-              groupKey={this.props.groupKey} color={this.props.color} />
-            <XLabels graphW={this.state.graphW} graphH={this.state.graphH}
-              xKey={this.props.xKey} data={this.props.data} />
-          </g>
-          <g>
-            <Axes axisW={this.state.axisW} axisH={this.state.graphH}
-              step={stepH}/>
-            <YLabels axisH={this.state.graphH} stepH={stepH} step={step} />
-          </g>
+      <svg width={this.state.w+this.state.legendW} height={this.state.h}>
+        <g transform={graphShift}>
+          <g>{gridlines}</g>
+          <g transform={barsShift}>{barRects}</g>
+          <g transform={barsShift}>{xLabels}</g>
+          <g>{yTicks}</g>
+          <g>{yLabels}</g>
+          <XAxis width={this.state.axisW} height={this.state.graphH}/>
+          <YAxis height={this.state.graphH}/>
+        </g>
+        <g transform={legendShift}>
+          <Legend legend={this.legend} />
         </g>
       </svg>
-    );
+    )
   }
 }
 

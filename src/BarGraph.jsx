@@ -1,5 +1,5 @@
 import React from "react"
-//import {spring, Motion} from "react-motion"
+import {spring, Motion} from "react-motion"
 
 let greenPalette = ["#3498db","#16a085","#1abc9c","#2ecc71"]
 
@@ -24,9 +24,22 @@ function groupTest(x,y,group,i) {
 class Bar extends React.Component {
 
   render() {
-    return (<rect x={this.props.x} y={this.props.y}
-      width={this.props.width} height={this.props.height}
-      fill={this.props.color} />);
+    return (
+      <Motion
+        defaultStyle={{ height: 0 }}
+        style={{
+          height: spring(this.props.height, {stiffness: 120, damping: 20})
+        }}
+      >
+        {
+          style =>
+            <rect
+              x={this.props.x} y={this.props.graphHeight-style.height}
+              width={this.props.width} height={style.height}
+              fill={this.props.color} />
+        }
+      </Motion>
+    )
   }
 }
 
@@ -36,7 +49,7 @@ class XAxis extends React.Component {
   render() {
     return(
       <line
-        x1={this.props.strokeWidth} y1={this.props.height}
+        x1="0" y1={this.props.height}
         x2={this.props.width} y2={this.props.height}
         strokeWidth={this.props.strokeWidth} stroke={this.props.color}
       />
@@ -45,7 +58,7 @@ class XAxis extends React.Component {
 }
 
 XAxis.defaultProps = {
-  strokeWidth: 3,
+  strokeWidth: 2,
   color: "#1b1b1b",
 }
 
@@ -78,8 +91,8 @@ class YAxis extends React.Component {
   render() {
     return(
       <line
-        x1={this.props.strokeWidth} y1="0"
-        x2={this.props.strokeWidth} y2={this.props.height}
+        x1="0" y1="0"
+        x2="0" y2={this.props.height}
         strokeWidth={this.props.strokeWidth} stroke={this.props.color}
       />
     )
@@ -87,7 +100,7 @@ class YAxis extends React.Component {
 }
 
 YAxis.defaultProps = {
-  strokeWidth: 3,
+  strokeWidth: 2,
   color: "#1b1b1b",
 }
 
@@ -96,17 +109,33 @@ class YTick extends React.Component {
 
   render() {
     return(
-      <line
-        x1={0} y1={this.props.y}
-        x2={this.props.strokeWidth*2} y2={this.props.y}
-        strokeWidth={this.props.strokeWidth} stroke={this.props.color}
-      />
+      <Motion
+        defaultStyle={{
+          opacity: 0,
+          y: 0,
+        }}
+        style={{
+          opacity: spring(1, {stiffness: 20, damping: 8}),
+          y: spring(this.props.y, {stiffness: 140, damping: 20}),
+        }}
+      >
+        {
+          style =>
+            <line
+              x1={-this.props.length/2} y1={style.y}
+              x2={this.props.length/2} y2={style.y}
+              strokeWidth={this.props.strokeWidth} stroke={this.props.color}
+              opacity={style.opacity}
+            />
+        }
+      </Motion>
     )
   }
 }
 
 YTick.defaultProps = {
-  strokeWidth: 3,
+  strokeWidth: 2,
+  length: 6,
   color: "#1b1b1b",
 }
 
@@ -115,12 +144,27 @@ class YLabel extends React.Component {
 
   render() {
     return(
-      <text
-        x="-5" y={this.props.y}
-        textAnchor="end" alignmentBaseline="middle"
-        fill={this.props.color} fontFamily={this.props.fontFamily}>
-          {this.props.value}
-      </text>
+      <Motion
+        defaultStyle={{
+          opacity: 0,
+          y: 0,
+        }}
+        style={{
+          opacity: spring(1, {stiffness: 20, damping: 8}),
+          y: spring(this.props.y, {stiffness: 140, damping: 20}),
+        }}
+      >
+        {
+          style =>
+            <text
+              x="-5" y={style.y}
+              textAnchor="end" alignmentBaseline="middle"
+              fill={this.props.color} fontFamily={this.props.fontFamily}
+              opacity={style.opacity} >
+                {this.props.value}
+            </text>
+        }
+      </Motion>
     )
   }
 }
@@ -135,17 +179,32 @@ class GridLine extends React.Component {
 
   render() {
     return(
-      <line
-        x1={this.props.strokeWidth} y1={this.props.y}
-        x2={this.props.width} y2={this.props.y}
-        strokeWidth={this.props.strokeWidth} stroke={this.props.color}
-      />
+      <Motion
+        defaultStyle={{
+          opacity: 0,
+          y: 0,
+        }}
+        style={{
+          opacity: spring(1, {stiffness: 20, damping: 8}),
+          y: spring(this.props.y, {stiffness: 140, damping: 20}),
+        }}
+      >
+        {
+          style =>
+            <line
+              x1="0" y1={style.y}
+              x2={this.props.width} y2={style.y}
+              strokeWidth={this.props.strokeWidth} stroke={this.props.color}
+              opacity={style.opacity}
+            />
+        }
+      </Motion>
     )
   }
 }
 
 GridLine.defaultProps = {
-  strokeWidth: 3,
+  strokeWidth: 2,
   color: "#7f8c8d",
 }
 
@@ -293,11 +352,10 @@ class BarGraph extends React.Component {
       let width = barWidth - padding
       let height = yVal * barScale
       let barX = barWidth * i
-      let barY = this.state.graphH - height
       let color = this.colorBar(xVal,yVal,group,i)
       return(
         <Bar
-          key={barX} x={barX} y={barY}
+          key={barX} x={barX} graphHeight={this.state.graphH}
           width={width} height={height} color={color} />
       )
     })
@@ -366,6 +424,7 @@ BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
   color: greenPalette,
+  yScale: "lin",
 }
 
 export default BarGraph

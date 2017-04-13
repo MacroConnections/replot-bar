@@ -1,25 +1,11 @@
 import React from "react"
 import {spring, Motion} from "react-motion"
 
-let greenPalette = ["#3498db","#16a085","#1abc9c","#2ecc71"]
+let rainbowPalette = ["#3498db","#16a085","#2ecc71","#f1c40f","#e67e22","#c0392b","#9b59b6"]
 
-function green(x,y,group,i) {
-  return greenPalette[i%greenPalette.length];
+function rainbow(x,y,group,i) {
+  return rainbowPalette[i%greenPalette.length];
 }
-
-function groupTest(x,y,group,i) {
-  switch (group) {
-    case "China":
-      return "#e74c3c"
-    case "India":
-      return "#e67e22"
-    case "United States":
-      return "#f39c12"
-    default:
-      return "black"
-  }
-}
-
 
 class Bar extends React.Component {
 
@@ -220,7 +206,7 @@ class Legend extends React.Component {
         let y = (i * 2 + 1) * this.props.size
         let x = this.props.size
         rows.push(
-          <g>
+          <g key={this.props.legend[title]}>
             <rect x={x} y={y} width={x} height={x}
               fill={this.props.legend[title]} />
             <text x={3*x} y={y+(x/2)}
@@ -284,24 +270,10 @@ class BarGraph extends React.Component {
       })
     }
 
-    let graphW = Math.min(80*this.props.data.length,800)
-    let graphH = 400
-    let margin = 25
-    let axisW = graphW + (2 * margin)
-    let w = axisW + (2.5 * margin)
-    let h = graphH + (5 * margin)
-
-    this.state = {
-      graphW: graphW,
-      graphH: graphH,
-      axisW: axisW,
-      margin: margin,
-      w: w,
-      h: h,
-      legendW: 200,
-    }
-
     this.legend = {}
+    this.barScale = 0
+    this.step = 0
+    this.stepHeight = 0
   }
 
   colorBar(x,y,group,i) {
@@ -328,49 +300,91 @@ class BarGraph extends React.Component {
     }
   }
 
-  render() {
+  getBars(barWidth,padding) {
+    let bars = this.props.data.map((d,i) => {
+      let xVal = d[this.props.xKey]
+      let yVal = d[this.props.yKey]
+      let group = d[this.props.groupKey]
+      let width = barWidth - padding
+      let barX = barWidth * i
+      let color = this.colorBar(xVal,yVal,group,i)
+      if (this.props.yScale === "lin") {
+        let height = yVal * this.barScale
+        return(
+          <Bar
+            key={barX} x={barX} graphHeight={this.props.graphH}
+            width={width} height={height} color={color} />
+        )
+      } else {
+        let height = Math.log10(yVal) * this.barScale
+        return(
+          <Bar
+            key={barX} x={barX} graphHeight={this.props.graphH}
+            width={width} height={height} color={color} />
+        )
+      }
+    })
+    return bars
+  }
+
+  calculateScale() {
     let maxY = 0
     for (var i = 0; i < this.props.data.length; i++) {
       if (this.props.data[i][this.props.yKey] > maxY) {
         maxY = this.props.data[i][this.props.yKey];
       }
     }
-    let barScale = this.state.graphH / (maxY * 1.1);
+    if (this.props.yScale === "lin") {
+      let barScale = this.props.graphH / (maxY * 1.1)
+      let unit = 10 ** (Math.floor(Math.log10(maxY)))
+      let nearest = Math.ceil(maxY/unit)
+      let step = (unit / 10) * nearest
+      let stepHeight = step * barScale
+      this.barScale = barScale
+      this.step = step
+      this.stepHeight = stepHeight
+      return true
+    } else {
+      let barScale = this.props.graphH / (Math.log10(maxY) * 1.1)
+      let maxLog = Math.floor(Math.log10(maxY))
+      let unitLog = 10 ** (Math.floor(Math.log10(maxLog)))
+      let nearestLog = Math.ceil(maxLog/unitLog)
+      let step = Math.max(1, (unitLog/10)*nearestLog)
+      let stepHeight = step * barScale
+      this.barScale = barScale
+      this.step = step
+      this.stepHeight = stepHeight
+      return true
+    }
+  }
 
-    let unit = 10 ** (Math.floor(Math.log10(maxY)))
-    let nearest = Math.ceil(maxY/unit)
-    let step = (unit / 10) * nearest
-    let stepHeight = step * barScale
+  render() {
+    let graphW = Math.min(80*this.props.data.length,800)
+    let axisW = graphW + (2 * this.props.margin)
+    let w = axisW + (2.5 * this.props.margin)
+    let h = this.props.graphH + (5 * this.props.margin)
 
-    let barWidth = this.state.graphW/this.props.data.length
-    let padding = barWidth * 0.2;
+    let barWidth = graphW/this.props.data.length
+    let padding = barWidth * 0.2
 
-    let barRects = this.props.data.map((d,i) => {
-      let xVal = d[this.props.xKey]
-      let yVal = d[this.props.yKey]
-      let group = d[this.props.groupKey]
-      let width = barWidth - padding
-      let height = yVal * barScale
-      let barX = barWidth * i
-      let color = this.colorBar(xVal,yVal,group,i)
-      return(
-        <Bar
-          key={barX} x={barX} graphHeight={this.state.graphH}
-          width={width} height={height} color={color} />
-      )
-    })
+    this.calculateScale()
+    
+    let step = this.step
+    let stepHeight = this.stepHeight
+
+    let barRects = this.getBars(barWidth,padding)
 
     let xLabels = this.props.data.map((d,i) => {
       let xLabelX = barWidth * (i + 0.5)
-      let xLabelY = this.state.graphH + 15
+      let xLabelY = this.props.graphH + 15
       return(
         <XLabel key={i} x={xLabelX} y={xLabelY} name={d[this.props.xKey]} />
       )
     })
 
     let yLabels = []
-    for (var i = 0; i * stepHeight < this.state.graphH; i++) {
-      let yLabelY = this.state.graphH - (stepHeight * i)
+    for (var i = 0; i * stepHeight < this.props.graphH; i++) {
+      let yLabelY = this.props.graphH - (stepHeight * i)
       let yLabelVal = step * i
       if (Math.log10(yLabelVal) > 3) {
         yLabelVal = yLabelVal.toExponential()
@@ -381,36 +395,36 @@ class BarGraph extends React.Component {
     }
 
     let yTicks = []
-    for (var i = stepHeight; i < this.state.graphH; i = i + stepHeight) {
-      let yTickY = this.state.graphH - i
+    for (var i = stepHeight; i < this.props.graphH; i = i + stepHeight) {
+      let yTickY = this.props.graphH - i
       yTicks.push(
         <YTick key={yTickY} y={yTickY} />
       )
     }
 
     let gridlines = []
-    for (var i = stepHeight; i < this.state.graphH; i = i + stepHeight) {
-      let gridY = this.state.graphH - i
+    for (var i = stepHeight; i < this.props.graphH; i = i + stepHeight) {
+      let gridY = this.props.graphH - i
       gridlines.push(
-        <GridLine key={gridY} y={gridY} width={this.state.axisW} />
+        <GridLine key={gridY} y={gridY} width={axisW} />
       )
     }
 
-    let barsShift = "translate(" + this.state.margin + ",0)"
-    let graphShift = "translate(" + (this.state.w - this.state.axisW) +
-      "," + this.state.margin + ")"
-    let legendShift = "translate(" + this.state.w + ",0)"
+    let barsShift = "translate(" + this.props.margin + ",0)"
+    let graphShift = "translate(" + (w - axisW) +
+      "," + this.props.margin + ")"
+    let legendShift = "translate(" + w + ",0)"
 
     return (
-      <svg width={this.state.w+this.state.legendW} height={this.state.h}>
+      <svg width={w+this.props.legendW} height={h}>
         <g transform={graphShift}>
           <g>{gridlines}</g>
           <g transform={barsShift}>{barRects}</g>
           <g transform={barsShift}>{xLabels}</g>
           <g>{yTicks}</g>
           <g>{yLabels}</g>
-          <XAxis width={this.state.axisW} height={this.state.graphH}/>
-          <YAxis height={this.state.graphH}/>
+          <XAxis width={axisW} height={this.props.graphH}/>
+          <YAxis height={this.props.graphH}/>
         </g>
         <g transform={legendShift}>
           <Legend legend={this.legend} />
@@ -423,8 +437,11 @@ class BarGraph extends React.Component {
 BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
-  color: greenPalette,
-  yScale: "lin",
+  color: rainbowPalette,
+  yScale: "log",
+  graphH: 400,
+  margin: 25,
+  legendW: 200,
 }
 
 export default BarGraph

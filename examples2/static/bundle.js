@@ -9796,23 +9796,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var greenPalette = ["#3498db", "#16a085", "#1abc9c", "#2ecc71"];
+var rainbowPalette = ["#3498db", "#16a085", "#2ecc71", "#f1c40f", "#e67e22", "#c0392b", "#9b59b6"];
 
-function green(x, y, group, i) {
-  return greenPalette[i % greenPalette.length];
-}
-
-function groupTest(x, y, group, i) {
-  switch (group) {
-    case "China":
-      return "#e74c3c";
-    case "India":
-      return "#e67e22";
-    case "United States":
-      return "#f39c12";
-    default:
-      return "black";
-  }
+function rainbow(x, y, group, i) {
+  return rainbowPalette[i % greenPalette.length];
 }
 
 var Bar = function (_React$Component) {
@@ -10102,7 +10089,7 @@ var Legend = function (_React$Component8) {
           var x = this.props.size;
           rows.push(_react2.default.createElement(
             "g",
-            null,
+            { key: this.props.legend[title] },
             _react2.default.createElement("rect", { x: x, y: y, width: x, height: x,
               fill: this.props.legend[title] }),
             _react2.default.createElement(
@@ -10173,24 +10160,10 @@ var BarGraph = function (_React$Component9) {
       });
     }
 
-    var graphW = Math.min(80 * _this13.props.data.length, 800);
-    var graphH = 400;
-    var margin = 25;
-    var axisW = graphW + 2 * margin;
-    var w = axisW + 2.5 * margin;
-    var h = graphH + 5 * margin;
-
-    _this13.state = {
-      graphW: graphW,
-      graphH: graphH,
-      axisW: axisW,
-      margin: margin,
-      w: w,
-      h: h,
-      legendW: 200
-    };
-
     _this13.legend = {};
+    _this13.barScale = 0;
+    _this13.step = 0;
+    _this13.stepHeight = 0;
     return _this13;
   }
 
@@ -10220,48 +10193,92 @@ var BarGraph = function (_React$Component9) {
       }
     }
   }, {
-    key: "render",
-    value: function render() {
+    key: "getBars",
+    value: function getBars(barWidth, padding) {
       var _this14 = this;
 
+      var bars = this.props.data.map(function (d, i) {
+        var xVal = d[_this14.props.xKey];
+        var yVal = d[_this14.props.yKey];
+        var group = d[_this14.props.groupKey];
+        var width = barWidth - padding;
+        var barX = barWidth * i;
+        var color = _this14.colorBar(xVal, yVal, group, i);
+        if (_this14.props.yScale === "lin") {
+          var height = yVal * _this14.barScale;
+          return _react2.default.createElement(Bar, {
+            key: barX, x: barX, graphHeight: _this14.props.graphH,
+            width: width, height: height, color: color });
+        } else {
+          var _height = Math.log10(yVal) * _this14.barScale;
+          return _react2.default.createElement(Bar, {
+            key: barX, x: barX, graphHeight: _this14.props.graphH,
+            width: width, height: _height, color: color });
+        }
+      });
+      return bars;
+    }
+  }, {
+    key: "calculateScale",
+    value: function calculateScale() {
       var maxY = 0;
       for (var i = 0; i < this.props.data.length; i++) {
         if (this.props.data[i][this.props.yKey] > maxY) {
           maxY = this.props.data[i][this.props.yKey];
         }
       }
-      var barScale = this.state.graphH / (maxY * 1.1);
+      if (this.props.yScale === "lin") {
+        var barScale = this.props.graphH / (maxY * 1.1);
+        var unit = 10 ** Math.floor(Math.log10(maxY));
+        var nearest = Math.ceil(maxY / unit);
+        var step = unit / 10 * nearest;
+        var stepHeight = step * barScale;
+        this.barScale = barScale;
+        this.step = step;
+        this.stepHeight = stepHeight;
+        return true;
+      } else {
+        var _barScale = this.props.graphH / (Math.log10(maxY) * 1.1);
+        var maxLog = Math.floor(Math.log10(maxY));
+        var unitLog = 10 ** Math.floor(Math.log10(maxLog));
+        var nearestLog = Math.ceil(maxLog / unitLog);
+        var _step = Math.max(1, unitLog / 10 * nearestLog);
+        var _stepHeight = _step * _barScale;
+        this.barScale = _barScale;
+        this.step = _step;
+        this.stepHeight = _stepHeight;
+        return true;
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this15 = this;
 
-      var unit = 10 ** Math.floor(Math.log10(maxY));
-      var nearest = Math.ceil(maxY / unit);
-      var step = unit / 10 * nearest;
-      var stepHeight = step * barScale;
+      var graphW = Math.min(80 * this.props.data.length, 800);
+      var axisW = graphW + 2 * this.props.margin;
+      var w = axisW + 2.5 * this.props.margin;
+      var h = this.props.graphH + 5 * this.props.margin;
 
-      var barWidth = this.state.graphW / this.props.data.length;
+      var barWidth = graphW / this.props.data.length;
       var padding = barWidth * 0.2;
 
-      var barRects = this.props.data.map(function (d, i) {
-        var xVal = d[_this14.props.xKey];
-        var yVal = d[_this14.props.yKey];
-        var group = d[_this14.props.groupKey];
-        var width = barWidth - padding;
-        var height = yVal * barScale;
-        var barX = barWidth * i;
-        var color = _this14.colorBar(xVal, yVal, group, i);
-        return _react2.default.createElement(Bar, {
-          key: barX, x: barX, graphHeight: _this14.state.graphH,
-          width: width, height: height, color: color });
-      });
+      this.calculateScale();
+
+      var step = this.step;
+      var stepHeight = this.stepHeight;
+
+      var barRects = this.getBars(barWidth, padding);
 
       var xLabels = this.props.data.map(function (d, i) {
         var xLabelX = barWidth * (i + 0.5);
-        var xLabelY = _this14.state.graphH + 15;
-        return _react2.default.createElement(XLabel, { key: i, x: xLabelX, y: xLabelY, name: d[_this14.props.xKey] });
+        var xLabelY = _this15.props.graphH + 15;
+        return _react2.default.createElement(XLabel, { key: i, x: xLabelX, y: xLabelY, name: d[_this15.props.xKey] });
       });
 
       var yLabels = [];
-      for (var i = 0; i * stepHeight < this.state.graphH; i++) {
-        var yLabelY = this.state.graphH - stepHeight * i;
+      for (var i = 0; i * stepHeight < this.props.graphH; i++) {
+        var yLabelY = this.props.graphH - stepHeight * i;
         var yLabelVal = step * i;
         if (Math.log10(yLabelVal) > 3) {
           yLabelVal = yLabelVal.toExponential();
@@ -10270,24 +10287,24 @@ var BarGraph = function (_React$Component9) {
       }
 
       var yTicks = [];
-      for (var i = stepHeight; i < this.state.graphH; i = i + stepHeight) {
-        var yTickY = this.state.graphH - i;
+      for (var i = stepHeight; i < this.props.graphH; i = i + stepHeight) {
+        var yTickY = this.props.graphH - i;
         yTicks.push(_react2.default.createElement(YTick, { key: yTickY, y: yTickY }));
       }
 
       var gridlines = [];
-      for (var i = stepHeight; i < this.state.graphH; i = i + stepHeight) {
-        var gridY = this.state.graphH - i;
-        gridlines.push(_react2.default.createElement(GridLine, { key: gridY, y: gridY, width: this.state.axisW }));
+      for (var i = stepHeight; i < this.props.graphH; i = i + stepHeight) {
+        var gridY = this.props.graphH - i;
+        gridlines.push(_react2.default.createElement(GridLine, { key: gridY, y: gridY, width: axisW }));
       }
 
-      var barsShift = "translate(" + this.state.margin + ",0)";
-      var graphShift = "translate(" + (this.state.w - this.state.axisW) + "," + this.state.margin + ")";
-      var legendShift = "translate(" + this.state.w + ",0)";
+      var barsShift = "translate(" + this.props.margin + ",0)";
+      var graphShift = "translate(" + (w - axisW) + "," + this.props.margin + ")";
+      var legendShift = "translate(" + w + ",0)";
 
       return _react2.default.createElement(
         "svg",
-        { width: this.state.w + this.state.legendW, height: this.state.h },
+        { width: w + this.props.legendW, height: h },
         _react2.default.createElement(
           "g",
           { transform: graphShift },
@@ -10316,8 +10333,8 @@ var BarGraph = function (_React$Component9) {
             null,
             yLabels
           ),
-          _react2.default.createElement(XAxis, { width: this.state.axisW, height: this.state.graphH }),
-          _react2.default.createElement(YAxis, { height: this.state.graphH })
+          _react2.default.createElement(XAxis, { width: axisW, height: this.props.graphH }),
+          _react2.default.createElement(YAxis, { height: this.props.graphH })
         ),
         _react2.default.createElement(
           "g",
@@ -10334,8 +10351,11 @@ var BarGraph = function (_React$Component9) {
 BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
-  color: greenPalette,
-  yScale: "lin"
+  color: rainbowPalette,
+  yScale: "log",
+  graphH: 400,
+  margin: 25,
+  legendW: 200
 };
 
 exports.default = BarGraph;
@@ -23867,8 +23887,142 @@ var KeyValueRow = function (_React$Component) {
   return KeyValueRow;
 }(_react2.default.Component);
 
-var KeyValueTable = function (_React$Component2) {
-  _inherits(KeyValueTable, _React$Component2);
+var NewRow = function (_React$Component2) {
+  _inherits(NewRow, _React$Component2);
+
+  function NewRow() {
+    _classCallCheck(this, NewRow);
+
+    return _possibleConstructorReturn(this, (NewRow.__proto__ || Object.getPrototypeOf(NewRow)).apply(this, arguments));
+  }
+
+  _createClass(NewRow, [{
+    key: "render",
+    value: function render() {
+      var _this3 = this;
+
+      var title = void 0;
+      var group = void 0;
+      var weight = void 0;
+
+      var style = {
+        input: {
+          width: "80px"
+        }
+      };
+
+      return _react2.default.createElement(
+        "tr",
+        null,
+        _react2.default.createElement(
+          "td",
+          null,
+          _react2.default.createElement("input", { style: style.input, type: "text", ref: function ref(node) {
+              title = node;
+            } })
+        ),
+        _react2.default.createElement(
+          "td",
+          null,
+          _react2.default.createElement("input", { style: style.input, type: "text", ref: function ref(node) {
+              group = node;
+            } })
+        ),
+        _react2.default.createElement(
+          "td",
+          null,
+          _react2.default.createElement("input", { style: style.input, type: "text", ref: function ref(node) {
+              weight = node;
+            } })
+        ),
+        _react2.default.createElement(
+          "td",
+          null,
+          _react2.default.createElement(
+            "button",
+            { onClick: function onClick() {
+                _this3.props.addData(title.value, group.value, weight.value);
+                title.value = "";
+                group.value = "";
+                weight.value = "";
+              } },
+            "Add"
+          )
+        )
+      );
+    }
+  }]);
+
+  return NewRow;
+}(_react2.default.Component);
+
+var ScaleSwitch = function (_React$Component3) {
+  _inherits(ScaleSwitch, _React$Component3);
+
+  function ScaleSwitch(props) {
+    _classCallCheck(this, ScaleSwitch);
+
+    var _this4 = _possibleConstructorReturn(this, (ScaleSwitch.__proto__ || Object.getPrototypeOf(ScaleSwitch)).call(this));
+
+    _this4.state = {
+      selected: "lin"
+    };
+    return _this4;
+  }
+
+  _createClass(ScaleSwitch, [{
+    key: "changeHandler",
+    value: function changeHandler(e) {
+      this.setState({
+        selected: e.target.value
+      });
+      this.props.updateScale(e.target.value);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var style = {
+        cell: {
+          width: "80px"
+        }
+      };
+
+      return _react2.default.createElement(
+        "tr",
+        null,
+        _react2.default.createElement(
+          "td",
+          { style: style.cell },
+          _react2.default.createElement(
+            "label",
+            null,
+            _react2.default.createElement("input", { type: "radio", value: "lin",
+              checked: this.state.selected === "lin",
+              onChange: this.changeHandler.bind(this) }),
+            "Linear"
+          )
+        ),
+        _react2.default.createElement(
+          "td",
+          { style: style.cell },
+          _react2.default.createElement(
+            "label",
+            null,
+            _react2.default.createElement("input", { type: "radio", value: "log",
+              checked: this.state.selected === "log",
+              onChange: this.changeHandler.bind(this) }),
+            "Log"
+          )
+        )
+      );
+    }
+  }]);
+
+  return ScaleSwitch;
+}(_react2.default.Component);
+
+var KeyValueTable = function (_React$Component4) {
+  _inherits(KeyValueTable, _React$Component4);
 
   function KeyValueTable() {
     _classCallCheck(this, KeyValueTable);
@@ -23927,6 +24081,24 @@ var KeyValueTable = function (_React$Component2) {
             null,
             rows
           )
+        ),
+        _react2.default.createElement(
+          "table",
+          null,
+          _react2.default.createElement(
+            "tbody",
+            null,
+            _react2.default.createElement(NewRow, { addData: this.props.addData.bind(this) })
+          )
+        ),
+        _react2.default.createElement(
+          "table",
+          null,
+          _react2.default.createElement(
+            "tbody",
+            null,
+            _react2.default.createElement(ScaleSwitch, { updateScale: this.props.updateScale.bind(this) })
+          )
         )
       );
     }
@@ -23935,18 +24107,19 @@ var KeyValueTable = function (_React$Component2) {
   return KeyValueTable;
 }(_react2.default.Component);
 
-var ExampleApp = function (_React$Component3) {
-  _inherits(ExampleApp, _React$Component3);
+var ExampleApp = function (_React$Component5) {
+  _inherits(ExampleApp, _React$Component5);
 
   function ExampleApp(props) {
     _classCallCheck(this, ExampleApp);
 
-    var _this3 = _possibleConstructorReturn(this, (ExampleApp.__proto__ || Object.getPrototypeOf(ExampleApp)).call(this, props));
+    var _this6 = _possibleConstructorReturn(this, (ExampleApp.__proto__ || Object.getPrototypeOf(ExampleApp)).call(this, props));
 
-    _this3.state = {
-      data: [{ weight: 1373, group: "China", title: "Male", color: "#4cab92" }, { weight: 1266, group: "China", title: "Female", color: "#ca0004" }, { weight: 323, group: "India", title: "Male", color: "#003953" }, { weight: 258, group: "India", title: "Female", color: "#eccc00" }, { weight: 205, group: "United States", title: "Male", color: "#9dbd5f" }, { weight: 201, group: "United States", title: "Female", color: "#0097bf" }]
+    _this6.state = {
+      data: [{ weight: 1373, group: "China", title: "Male" }, { weight: 1266, group: "China", title: "Female" }, { weight: 323, group: "India", title: "Male" }, { weight: 258, group: "India", title: "Female" }, { weight: 205, group: "United States", title: "Male" }, { weight: 201, group: "United States", title: "Female" }],
+      scale: "lin"
     };
-    return _this3;
+    return _this6;
   }
 
   _createClass(ExampleApp, [{
@@ -23966,6 +24139,22 @@ var ExampleApp = function (_React$Component3) {
       }
     }
   }, {
+    key: "addData",
+    value: function addData(title, group, weight) {
+      var mutatedData = JSON.parse(JSON.stringify(this.state.data));
+      mutatedData.push({
+        weight: weight,
+        group: group,
+        title: title
+      });
+      this.setState({ data: mutatedData });
+    }
+  }, {
+    key: "updateScale",
+    value: function updateScale(scale) {
+      this.setState({ scale: scale });
+    }
+  }, {
     key: "render",
     value: function render() {
       return _react2.default.createElement(
@@ -23976,12 +24165,15 @@ var ExampleApp = function (_React$Component3) {
           { style: { textAlign: "center" } },
           " Bar Graph "
         ),
-        _react2.default.createElement(KeyValueTable, { data: this.state.data, updateData: this.updateData.bind(this) }),
+        _react2.default.createElement(KeyValueTable, { data: this.state.data,
+          updateData: this.updateData.bind(this),
+          addData: this.addData.bind(this),
+          updateScale: this.updateScale.bind(this) }),
         _react2.default.createElement(
           "div",
           { style: { width: "70%", display: "inline-block" } },
           _react2.default.createElement(_index2.default, { data: this.state.data, xKey: "title", yKey: "weight",
-            groupKey: "group" })
+            groupKey: "group", yScale: this.state.scale })
         )
       );
     }

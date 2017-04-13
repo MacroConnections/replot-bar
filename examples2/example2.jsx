@@ -32,6 +32,86 @@ class KeyValueRow extends React.Component {
   }
 }
 
+class NewRow extends React.Component {
+  render() {
+    let title
+    let group
+    let weight
+
+    const style = {
+      input: {
+        width: "80px",
+      }
+    }
+
+    return(
+      <tr>
+        <td>
+          <input style={style.input} type="text" ref={node => {title = node}}/>
+        </td>
+        <td>
+          <input style={style.input} type="text" ref={node => {group = node}}/>
+        </td>
+        <td>
+          <input style={style.input} type="text" ref={node => {weight = node}}/>
+        </td>
+        <td>
+          <button onClick={() => {
+            this.props.addData(title.value,group.value,weight.value)
+            title.value=""
+            group.value=""
+            weight.value=""
+          }}>Add</button>
+        </td>
+      </tr>
+    )
+  }
+}
+
+class ScaleSwitch extends React.Component {
+  constructor(props) {
+    super()
+    this.state = {
+      selected: "lin"
+    }
+  }
+
+  changeHandler(e) {
+    this.setState({
+      selected: e.target.value
+    })
+    this.props.updateScale(e.target.value)
+  }
+
+  render() {
+    const style = {
+      cell: {
+        width: "80px",
+      }
+    }
+
+    return (
+      <tr>
+        <td style={style.cell} >
+          <label>
+            <input type="radio" value="lin"
+              checked={this.state.selected==="lin"}
+              onChange={this.changeHandler.bind(this)}/>
+            Linear
+          </label>
+        </td>
+        <td style={style.cell} >
+          <label>
+            <input type="radio" value="log"
+              checked={this.state.selected==="log"}
+              onChange={this.changeHandler.bind(this)} />
+            Log
+          </label>
+        </td>
+      </tr>
+    )
+  }
+}
 
 class KeyValueTable extends React.Component {
 
@@ -61,6 +141,16 @@ class KeyValueTable extends React.Component {
             {rows}
           </tbody>
         </table>
+        <table>
+          <tbody>
+            <NewRow addData={this.props.addData.bind(this)} />
+          </tbody>
+        </table>
+        <table>
+          <tbody>
+            <ScaleSwitch updateScale={this.props.updateScale.bind(this)} />
+          </tbody>
+        </table>
       </div>
     )
   }
@@ -74,13 +164,14 @@ class ExampleApp extends React.Component {
     super(props)
     this.state = {
       data: [
-        {weight: 1373, group: "China", title: "Male", color: "#4cab92"},
-        {weight: 1266, group: "China", title: "Female", color: "#ca0004"},
-        {weight: 323, group: "India", title: "Male", color: "#003953"},
-        {weight: 258, group: "India", title: "Female", color: "#eccc00"},
-        {weight: 205, group: "United States", title: "Male", color: "#9dbd5f"},
-        {weight: 201, group: "United States", title: "Female", color: "#0097bf"},
-      ]
+        {weight: 1373, group: "China", title: "Male"},
+        {weight: 1266, group: "China", title: "Female"},
+        {weight: 323, group: "India", title: "Male"},
+        {weight: 258, group: "India", title: "Female"},
+        {weight: 205, group: "United States", title: "Male"},
+        {weight: 201, group: "United States", title: "Female"},
+      ],
+      scale: "lin"
     }
   }
 
@@ -100,14 +191,31 @@ class ExampleApp extends React.Component {
     }
   }
 
+  addData(title,group,weight) {
+    let mutatedData = JSON.parse(JSON.stringify(this.state.data))
+    mutatedData.push({
+      weight: weight,
+      group: group,
+      title: title
+    })
+    this.setState({data: mutatedData})
+  }
+
+  updateScale(scale) {
+    this.setState({scale: scale})
+  }
+
   render() {
     return(
       <div className="container">
         <h1 style={{textAlign: "center"}}> Bar Graph </h1>
-        <KeyValueTable data={this.state.data} updateData={this.updateData.bind(this)} />
+        <KeyValueTable data={this.state.data}
+          updateData={this.updateData.bind(this)}
+          addData={this.addData.bind(this)}
+          updateScale={this.updateScale.bind(this)} />
         <div style={{width:"70%", display:"inline-block"}}>
           <BarGraph data={this.state.data} xKey="title" yKey="weight"
-            groupKey="group" />
+            groupKey="group" yScale={this.state.scale} />
         </div>
       </div>
     )

@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Bar graph component for React",
   "main": "index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MacroConnections/react-bar.git"
@@ -28,9 +27,10 @@
     "babel-preset-react": "^6.23.0",
     "eslint": "^3.16.1",
     "eslint-plugin-react": "^6.10.0",
+    "humanize-plus": "^1.8.2",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "webpack": "^2.2.1",
-    "react-motion": "^0.4.7"
+    "react-motion": "^0.4.7",
+    "webpack": "^2.2.1"
   }
 }

@@ -1,250 +1,32 @@
 import React from "react"
 import {spring, Motion} from "react-motion"
+import Humanize from "humanize-plus"
+import {XAxis, YAxis, YTick, GridLine} from "./Axes.jsx"
+import {XLabel, YLabel, Legend} from "./Labels.jsx"
 
 let rainbowPalette = ["#3498db","#16a085","#2ecc71","#f1c40f","#e67e22","#c0392b","#9b59b6"]
 
 function rainbow(x,y,group,i) {
-  return rainbowPalette[i%greenPalette.length];
+  return rainbowPalette[i%rainbowPalette.length];
 }
 
-class Bar extends React.Component {
-
-  render() {
-    return (
-      <Motion
-        defaultStyle={{ height: 0 }}
-        style={{
-          height: spring(this.props.height, {stiffness: 120, damping: 20})
-        }}
-      >
-        {
-          style =>
-            <rect
-              x={this.props.x} y={this.props.graphHeight-style.height}
-              width={this.props.width} height={style.height}
-              fill={this.props.color} />
-        }
-      </Motion>
-    )
-  }
-}
-
-
-class XAxis extends React.Component {
-
-  render() {
-    return(
-      <line
-        x1="0" y1={this.props.height}
-        x2={this.props.width} y2={this.props.height}
-        strokeWidth={this.props.strokeWidth} stroke={this.props.color}
-      />
-    )
-  }
-}
-
-XAxis.defaultProps = {
-  strokeWidth: 2,
-  color: "#1b1b1b",
-}
-
-
-class XLabel extends React.Component {
-
-  render() {
-    let rotation = "rotate(" + this.props.tilt + "," + this.props.x +
-      "," + this.props.y + ")"
-    return(
-      <text
-        x={this.props.x} y={this.props.y}
-        textAnchor="end" transform={rotation}
-        fill={this.props.color} fontFamily={this.props.fontFamily}>
-          {this.props.name}
-      </text>
-    )
-  }
-}
-
-XLabel.defaultProps = {
-  color: "#1b1b1b",
-  fontFamily: "Sans-Serif",
-  tilt: -65,
-}
-
-
-class YAxis extends React.Component {
-
-  render() {
-    return(
-      <line
-        x1="0" y1="0"
-        x2="0" y2={this.props.height}
-        strokeWidth={this.props.strokeWidth} stroke={this.props.color}
-      />
-    )
-  }
-}
-
-YAxis.defaultProps = {
-  strokeWidth: 2,
-  color: "#1b1b1b",
-}
-
-
-class YTick extends React.Component {
-
-  render() {
-    return(
-      <Motion
-        defaultStyle={{
-          opacity: 0,
-          y: 0,
-        }}
-        style={{
-          opacity: spring(1, {stiffness: 20, damping: 8}),
-          y: spring(this.props.y, {stiffness: 140, damping: 20}),
-        }}
-      >
-        {
-          style =>
-            <line
-              x1={-this.props.length/2} y1={style.y}
-              x2={this.props.length/2} y2={style.y}
-              strokeWidth={this.props.strokeWidth} stroke={this.props.color}
-              opacity={style.opacity}
-            />
-        }
-      </Motion>
-    )
-  }
-}
-
-YTick.defaultProps = {
-  strokeWidth: 2,
-  length: 6,
-  color: "#1b1b1b",
-}
-
-
-class YLabel extends React.Component {
-
-  render() {
-    return(
-      <Motion
-        defaultStyle={{
-          opacity: 0,
-          y: 0,
-        }}
-        style={{
-          opacity: spring(1, {stiffness: 20, damping: 8}),
-          y: spring(this.props.y, {stiffness: 140, damping: 20}),
-        }}
-      >
-        {
-          style =>
-            <text
-              x="-5" y={style.y}
-              textAnchor="end" alignmentBaseline="middle"
-              fill={this.props.color} fontFamily={this.props.fontFamily}
-              opacity={style.opacity} >
-                {this.props.value}
-            </text>
-        }
-      </Motion>
-    )
-  }
-}
-
-YLabel.defaultProps = {
-  color: "#1b1b1b",
-  fontFamily: "Sans-Serif",
-}
-
-
-class GridLine extends React.Component {
-
-  render() {
-    return(
-      <Motion
-        defaultStyle={{
-          opacity: 0,
-          y: 0,
-        }}
-        style={{
-          opacity: spring(1, {stiffness: 20, damping: 8}),
-          y: spring(this.props.y, {stiffness: 140, damping: 20}),
-        }}
-      >
-        {
-          style =>
-            <line
-              x1="0" y1={style.y}
-              x2={this.props.width} y2={style.y}
-              strokeWidth={this.props.strokeWidth} stroke={this.props.color}
-              opacity={style.opacity}
-            />
-        }
-      </Motion>
-    )
-  }
-}
-
-GridLine.defaultProps = {
-  strokeWidth: 2,
-  color: "#7f8c8d",
-}
-
-
-class Legend extends React.Component {
-
-  render() {
-    let titles = Object.keys(this.props.legend)
-    let rows = [];
-    for (var i=0; i<titles.length; i++) {
-      let title = titles[i]
-      if (title) {
-        let y = (i * 2 + 1) * this.props.size
-        let x = this.props.size
-        rows.push(
-          <g key={this.props.legend[title]}>
-            <rect x={x} y={y} width={x} height={x}
-              fill={this.props.legend[title]} />
-            <text x={3*x} y={y+(x/2)}
-              alignmentBaseline="middle" fontSize={x}
-              fontFamily={this.props.fontFamily}>
-                {title}
-            </text>
-          </g>
-        )
-      }
-    }
-
-    if (rows.length === 0) {
-      return null
-    } else {
-      let height = (titles.length * 2 + 1) * this.props.size
-      return(
-        <g>
+const Bar = (props) => {
+  return (
+    <Motion
+      defaultStyle={{ height: 0 }}
+      style={{
+        height: spring(props.height, {stiffness: 120, damping: 20})
+      }}
+    >
+      {
+        style =>
           <rect
-            x="0" y="0" width={this.props.width} height={height}
-            strokeWidth={this.props.strokeWidth}
-            stroke={this.props.strokeColor}
-            fill={this.props.background} />
-          {rows}
-        </g>
-      )
-    }
-  }
-}
-
-Legend.defaultProps = {
-  size: 20,
-  width: 200,
-  fontColor: "#1b1b1b",
-  fontFamily: "Sans-Serif",
-  strokeColor: "#1b1b1b",
-  strokeWidth: 1,
-  background: "#ffffff",
+            x={props.x} y={props.graphHeight-style.height}
+            width={props.width} height={style.height}
+            fill={props.color} />
+      }
+    </Motion>
+  )
 }
 
 
@@ -343,7 +125,6 @@ class BarGraph extends React.Component {
       this.barScale = barScale
       this.step = step
       this.stepHeight = stepHeight
-      return true
     } else {
       let barScale = this.props.graphH / (Math.log10(maxY) * 1.1)
       let maxLog = Math.floor(Math.log10(maxY))
@@ -354,7 +135,6 @@ class BarGraph extends React.Component {
       this.barScale = barScale
       this.step = step
       this.stepHeight = stepHeight
-      return true
     }
   }
 
@@ -368,7 +148,7 @@ class BarGraph extends React.Component {
     let padding = barWidth * 0.2
 
     this.calculateScale()
-    
+
     let step = this.step
     let stepHeight = this.stepHeight
 
@@ -383,15 +163,22 @@ class BarGraph extends React.Component {
     })
 
     let yLabels = []
-    for (var i = 0; i * stepHeight < this.props.graphH; i++) {
+    yLabels.push(
+      <YLabel key={this.props.graphH} y={this.props.graphH} value={"0"} />
+    )
+    for (var i = 1; i * stepHeight < this.props.graphH; i++) {
       let yLabelY = this.props.graphH - (stepHeight * i)
-      let yLabelVal = step * i
-      if (Math.log10(yLabelVal) > 3) {
-        yLabelVal = yLabelVal.toExponential()
+      if (this.props.yScale === "lin") {
+        let yLabelVal = Humanize.compactInteger(step*i,1)
+        yLabels.push(
+          <YLabel key={yLabelY} y={yLabelY} value={yLabelVal} />
+        )
+      } else {
+        let yLabelVal = "e+" + (step*i)
+        yLabels.push(
+          <YLabel key={yLabelY} y={yLabelY} value={yLabelVal} />
+        )
       }
-      yLabels.push(
-        <YLabel key={yLabelY} y={yLabelY} value={yLabelVal} />
-      )
     }
 
     let yTicks = []

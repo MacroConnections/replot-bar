@@ -9,7 +9,7 @@ Intelligent and customizable bar graph components for React projects.
 
 #### Basic Bar Graph
 
-You can supply the data as array of JSON objects. 
+You can supply the data as array of JSON objects.
 
 ```javascript
 render() {
@@ -20,7 +20,7 @@ render() {
   ];
 
   return(
-    <BarGraph data={populations} xKey="country" 
+    <BarGraph data={populations} xKey="country"
     yKey="population"/>
   );
 }
@@ -32,27 +32,27 @@ render() {
 
 #### Group Bar Graph
 
-You can supply the data as array of JSON objects. 
+You can supply the data as array of JSON objects.
 
 ```javascript
 render() {
   let populations = [
-    {country: "China", year: 1980, count: 981200000}, 
-    {country: "China", year: 1990, count: 1135000000}, 
+    {country: "China", year: 1980, count: 981200000},
+    {country: "China", year: 1990, count: 1135000000},
     {country: "China", year: 2000, count: 1263000000},
-    {country: "India", year: 1980, count: 699000000}, 
-    {country: "India", year: 1990, count: 868900000}, 
+    {country: "India", year: 1980, count: 699000000},
+    {country: "India", year: 1990, count: 868900000},
     {country: "India", year: 2000, count: 1042000000}
   ];
-	
+
 	return(
-		<BarGraph data={populations} xKey="year" yKey="count" 
+		<BarGraph data={populations} xKey="year" yKey="count"
 		groupKey="country"/>
 	);
 }
 ```
 
-- `groupKey` defaults to `"group"`. Group of bar graph is number or string.
+- `groupKey` is number or string.
 
 ### Customization
 
@@ -62,7 +62,7 @@ render() {
  * Array of hex colors or Function of x, y, group values to hex color
  * Default: Auto-generated color palette
  * Fills the bars with the iteration of colors, if an array is specified
- * Fills the bars with the output colors, if a function is specified 
+ * Fills the bars with the output colors, if a function is specified
 
 ##### Example: Array of hex colors
 ```javascript
@@ -89,7 +89,7 @@ function coloring(x, y, group) {
 
 #### Stacked Bar Graph
 
-You can supply the data as array of JSON objects. 
+You can supply the data as array of JSON objects.
 
 ```javascript
 render() {
@@ -111,7 +111,7 @@ render() {
   let genders = ["male","female"]
 
   return(
-    <BarGraph data={populations} xKey="country" 
+    <BarGraph data={populations} xKey="country"
     yKey="population" stackKey={genders} />
   )
 }
@@ -134,7 +134,7 @@ render() {
 
 * `yScale`
  * Options: `"linear"`,`"log"`
- * Default: `"linear"` 
+ * Default: `"linear"`
  * Sets the scaling of y-axis
 
 * `barWitdh`
@@ -205,7 +205,7 @@ render() {
  * The module auto-select the color scheme for `"auto"`
 
 * `effect`
- * Options: `"none"`,`"sequential"`,`"diverging"`,`"constant"`,`"gradient"` 
+ * Options: `"none"`,`"sequential"`,`"diverging"`,`"constant"`,`"gradient"`
  * Default: `"none"`
  * Sets the effect of bar coloring
 

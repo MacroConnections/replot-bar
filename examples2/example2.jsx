@@ -57,7 +57,7 @@ class NewRow extends React.Component {
         </td>
         <td>
           <button onClick={() => {
-            this.props.addData(title.value,group.value,weight.value)
+            this.props.addData(title.value,group.value,parseInt(weight.value))
             title.value=""
             group.value=""
             weight.value=""

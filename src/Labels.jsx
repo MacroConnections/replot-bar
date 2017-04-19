@@ -9,7 +9,8 @@ const XLabel = (props) => {
     <text
       x={props.x} y={props.y}
       textAnchor="end" transform={rotation}
-      fill={props.color} fontFamily={props.fontFamily}>
+      fill={props.color} fontFamily={props.fontFamily}
+      display={props.display} >
         {props.name}
     </text>
   )
@@ -17,8 +18,9 @@ const XLabel = (props) => {
 
 XLabel.defaultProps = {
   color: "#1b1b1b",
-  fontFamily: "Sans-Serif",
+  fontFamily: "Open Sans",
   tilt: -65,
+  display: "inline"
 }
 
 
@@ -40,7 +42,7 @@ const YLabel = (props) => {
             x="-10" y={style.y}
             textAnchor="end" alignmentBaseline="middle"
             fill={props.color} fontFamily={props.fontFamily}
-            opacity={style.opacity} >
+            opacity={style.opacity} display={props.display}>
               {props.value}
           </text>
       }
@@ -50,24 +52,26 @@ const YLabel = (props) => {
 
 YLabel.defaultProps = {
   color: "#1b1b1b",
-  fontFamily: "Sans-Serif",
+  fontFamily: "Open Sans",
+  display: "inline"
 }
 
 
 const Legend = (props) => {
-  let titles = Object.keys(props.legend)
-  let rows = [];
+  let titles = Object.keys(props.legend).sort()
+  let items = []
+  let size = Math.min(20, (props.height / Math.ceil(titles.length/4)) / 1.5)
   for (var i=0; i<titles.length; i++) {
     let title = titles[i]
     if (title) {
-      let y = (i * 2 + 1) * props.size
-      let x = props.size
-      rows.push(
+      let y = (Math.floor(i/4) * 1.5) * size
+      let x = (i % 4) * (props.width / 4)
+      items.push(
         <g key={props.legend[title]}>
-          <rect x={x} y={y} width={x} height={x}
-            fill={props.legend[title]} />
-          <text x={3*x} y={y+(x/2)}
-            alignmentBaseline="middle" fontSize={x}
+           <rect x={x} y={y} width={size} height={size}
+             fill={props.legend[title]} />
+          <text x={x+1.5*size} y={y+(size/2)}
+            alignmentBaseline="middle" fontSize={size}
             fontFamily={props.fontFamily}>
               {title}
           </text>
@@ -76,31 +80,25 @@ const Legend = (props) => {
     }
   }
 
-  if (rows.length === 0) {
+  if (items.length === 0) {
     return null
   } else {
     let height = (titles.length * 2 + 1) * props.size
     return(
-      <g>
-        <rect
-          x="0" y="0" width={props.width} height={height}
-          strokeWidth={props.strokeWidth}
-          stroke={props.strokeColor}
-          fill={props.background} />
-        {rows}
+      <g display={props.display}>
+        {items}
       </g>
     )
   }
 }
 
 Legend.defaultProps = {
-  size: 20,
-  width: 200,
   fontColor: "#1b1b1b",
-  fontFamily: "Sans-Serif",
+  fontFamily: "Open Sans",
   strokeColor: "#1b1b1b",
   strokeWidth: 1,
   background: "#ffffff",
+  display: "inline"
 }
 
 module.exports = {

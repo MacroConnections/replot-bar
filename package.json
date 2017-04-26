@@ -1,6 +1,6 @@
 {
   "name": "replot-bar",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Bar graph component for React",
   "main": "index.js",
   "scripts": {},

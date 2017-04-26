@@ -1,12 +1,12 @@
 {
-  "name": "react-bar",
+  "name": "replot-bar",
   "version": "1.0.0",
   "description": "Bar graph component for React",
   "main": "index.js",
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MacroConnections/react-bar.git"
+    "url": "git+https://github.com/MacroConnections/replot-bar.git"
   },
   "keywords": [
     "react",
@@ -17,9 +17,9 @@
   "author": "Alisa Ono",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MacroConnections/react-bar/issues"
+    "url": "https://github.com/MacroConnections/replot-bar/issues"
   },
-  "homepage": "https://github.com/MacroConnections/react-bar#readme",
+  "homepage": "https://github.com/MacroConnections/replot-bar#readme",
   "dependencies": {
     "babel-core": "^6.23.1",
     "babel-loader": "^6.3.2",

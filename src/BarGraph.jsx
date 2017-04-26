@@ -5,14 +5,9 @@ import {XAxis, YAxis, YTick, GridLine} from "./Axes.jsx"
 import {XLabel, YLabel, Legend} from "./Labels.jsx"
 
 /* Default base palette */
-let rainbowPalette = [
+let defaultPalette = [
   "#3498db","#16a085","#2ecc71","#f1c40f","#e67e22","#c0392b","#9b59b6"
 ]
-
-/* Color function for testing */
-function rainbowFunc(x,y,group,i) {
-  return rainbowPalette[i%rainbowPalette.length];
-}
 
 /* Take a base palette and return a new palette with x (= count) colors.
   Base palette must have at least 2 colors */
@@ -362,17 +357,17 @@ class BarGraph extends React.Component {
 BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
-  color: rainbowPalette,
-  yScale: "lin",
   graphH: 600,
   maxGraphW: 800,
-  legend: "inline",
-  xAxis: "inline",
-  yAxis: "inline",
-  yTick: "inline",
+  color: defaultPalette,
   gridline: "inline",
+  xAxis: "inline",
   xLabel: "inline",
-  yLabel: "inline"
+  yAxis: "inline",
+  yScale: "lin",
+  yTick: "inline",
+  yLabel: "inline",
+  legend: "inline"
 }
 
 export default BarGraph

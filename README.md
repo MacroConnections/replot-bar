@@ -1,4 +1,4 @@
-# React x Bar Graph
+# Replot x Bar
 Intelligent and customizable bar graph components for React projects.
 
 ## Installation
@@ -17,12 +17,12 @@ render() {
     {country: "China", population: 1388232693},
     {country: "India", population: 1342512706},
     {country: "USA", population: 326474013},
-  ];
+  ]
 
   return(
     <BarGraph data={populations} xKey="country"
     yKey="population"/>
-  );
+  )
 }
 ```
 
@@ -43,12 +43,12 @@ render() {
     {country: "India", year: 1980, count: 699000000},
     {country: "India", year: 1990, count: 868900000},
     {country: "India", year: 2000, count: 1042000000}
-  ];
+  ]
 
 	return(
 		<BarGraph data={populations} xKey="year" yKey="count"
 		groupKey="country"/>
-	);
+	)
 }
 ```
 
@@ -56,17 +56,30 @@ render() {
 
 ### Customization
 
+#### Layout
+
+* `graphH`
+ * Positive number
+ * Default: 600
+ * Sets the height of the bar graph
+
+* `maxGraphW`
+ * Positive number
+ * Default: 800
+ * Sets the maximum width of the bar graph
+
 #### Color
 
 * `color`
  * Array of hex colors or Function of x, y, group values to hex color
- * Default: Auto-generated color palette
- * Fills the bars with the iteration of colors, if an array is specified
+ * Default: Colorization using an auto generated palette
+ * Fills the bars with the iteration of colors from the array, if a color array and no group key are specified
+ * Fills the bars using a palette generated based on colors from the array, if a color array and group key are specified
  * Fills the bars with the output colors, if a function is specified
 
 ##### Example: Array of hex colors
 ```javascript
-let colors = ["#2ecc71","#1abc9c","#16a085"];
+let colors = ["#2ecc71","#1abc9c","#16a085"]
 <BarGraph data={data} color={colors}>
 ```
 ##### Example: Function of x, y, group values to hex color
@@ -84,6 +97,59 @@ function coloring(x, y, group) {
 }
 <BarGraph data={data} color={coloring}>
 ```
+
+#### Axes and Labels
+
+* `gridline`
+ * Options: `"inline"`,`"none"`
+ * Default: `"inline"`
+ * Display the gridlines if "inline" is selected
+ * Do not display the gridlines if "none" is selected
+
+* `xAxis`
+ * Options: `"inline"`,`"none"`
+ * Default: `"inline"`
+ * Display the x-axis if "inline" is selected
+ * Do not display the x-axis if "none" is selected
+
+* `xLabel`
+ * Options: `"inline"`,`"none"`
+ * Default: `"inline"`
+ * Display the x-axis labels if "inline" is selected
+ * Do not display the x-axis labels if "none" is selected
+
+* `yAxis`
+ * Options: `"inline"`,`"none"`
+ * Default: `"inline"`
+ * Display the y-axis if "inline" is selected
+ * Do not display the y-axis if "none" is selected
+
+* `yScale`
+ * Options: `"lin"`,`"log"`
+ * Default: `"lin"`
+ * Sets the scaling of y-axis to linear if "lin" is selected
+ * Sets the scaling of y-axis to logarithmic if "log" is selected
+
+* `yTick`
+ * Options: `"inline"`,`"none"`
+ * Default: `"inline"`
+ * Display the y-axis ticks if "inline" is selected
+ * Do not display the y-axis ticks if "none" is selected
+
+* `yLabel`
+ * Options: `"inline"`,`"none"`
+ * Default: `"inline"`
+ * Display the y-axis labels if "inline" is selected
+ * Do not display the y-axis labels if "none" is selected
+
+#### Legend
+
+* `legend`
+* Options: `"inline"`,`"none"`
+* Default: `"inline"` (Legend is created only if group key is specified)
+* Display the legend if "inline" is selected
+* Do not display the legend if "none" is selected
+
 
 ### Future Implementation
 
@@ -132,69 +198,10 @@ render() {
  * Sets the number of ticks on y-axis
  * The module auto-selects the number of ticks, if not specified
 
-* `yScale`
- * Options: `"linear"`,`"log"`
- * Default: `"linear"`
- * Sets the scaling of y-axis
-
 * `barWitdh`
  * Options: `"standard"`,`"narrow"`,`"wide"`
  * Default: `"standard"`
  * Sets the style of bar width
-
-#### Axes and Labels
-
-* `gridline`
- * Options: `"show"`,`"hidden"`
- * Default: `"show"`
- * Sets whether the gridlines are displayed
-
-* `xAxis`
- * Options: `"show"`,`"hidden"`
- * Default: `"show"`
- * Sets whether the x-axis is displayed
-
-* `xLabel`
- * Options: `"show"`,`"hidden"`
- * Default: `"show"`
- * Sets whether the x-axis labels are displayed
-
-* `yAxis`
- * Options: `"show"`,`"hidden"`
- * Default: `"show"`
- * Sets whether the y-axis is displayed
-
-* `yLabel`
- * Options: `"show"`,`"hidden"`
- * Default: `"show"`
- * Sets whether the y-axis labels are displayed
-
-* `marker`
- * Options: `"none"`,`"in"`,`"above"`
- * Default: `"none"`
- * No markers are displayed for `"none"`
- * Markers are displayed inside each bar for `"in"`
- * Markers are displayed above each bar for `"above"`
-
-* `graphTitle`
- * String
- * Sets the optional title for the bar graph
- * No title for the graph is set unless specified
-
-* `xTitle`
- * String
- * Sets the optional title for the x-axis
- * No title for the x-axis is set unless specified
-
-* `yTitle`
- * String
- * Sets the optional title for the y-axis
- * No title for the y-axis is set unless specified
-
-* `doubleAxes`
- * Options: `"forbid"`, `"allow"`
- * Default: `"forbid"`
- * Allows the module to auto-scale and display group bar graph with doble axes
 
 #### Color
 
@@ -208,6 +215,35 @@ render() {
  * Options: `"none"`,`"sequential"`,`"diverging"`,`"constant"`,`"gradient"`
  * Default: `"none"`
  * Sets the effect of bar coloring
+
+#### Axes and Labels
+
+ * `marker`
+  * Options: `"none"`,`"in"`,`"above"`
+  * Default: `"none"`
+  * No markers are displayed for `"none"`
+  * Markers are displayed inside each bar for `"in"`
+  * Markers are displayed above each bar for `"above"`
+
+ * `graphTitle`
+  * String
+  * Sets the optional title for the bar graph
+  * No title for the graph is set unless specified
+
+ * `xTitle`
+  * String
+  * Sets the optional title for the x-axis
+  * No title for the x-axis is set unless specified
+
+ * `yTitle`
+  * String
+  * Sets the optional title for the y-axis
+  * No title for the y-axis is set unless specified
+
+ * `doubleAxes`
+  * Options: `"forbid"`, `"allow"`
+  * Default: `"forbid"`
+  * Allows the module to auto-scale and display group bar graph with doble axes
 
 #### Legend
 

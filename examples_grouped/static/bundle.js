@@ -10375,7 +10375,7 @@ var XAxis = function XAxis(props) {
 };
 
 XAxis.defaultProps = {
-  strokeWidth: 2,
+  strokeWidth: 1,
   color: "#1b1b1b",
   display: "inline"
 };
@@ -10390,7 +10390,7 @@ var YAxis = function YAxis(props) {
 };
 
 YAxis.defaultProps = {
-  strokeWidth: 2,
+  strokeWidth: 1,
   color: "#1b1b1b",
   display: "inline"
 };
@@ -10420,7 +10420,7 @@ var YTick = function YTick(props) {
 };
 
 YTick.defaultProps = {
-  strokeWidth: 2,
+  strokeWidth: 1,
   length: 6,
   color: "#1b1b1b",
   display: "inline"
@@ -10435,7 +10435,7 @@ var GridLine = function GridLine(props) {
         y: 0
       },
       style: {
-        opacity: (0, _reactMotion.spring)(1, { stiffness: 20, damping: 8 }),
+        opacity: (0, _reactMotion.spring)(props.opacity, { stiffness: 20, damping: 8 }),
         y: (0, _reactMotion.spring)(props.y, { stiffness: 140, damping: 20 })
       }
     },
@@ -10451,8 +10451,9 @@ var GridLine = function GridLine(props) {
 };
 
 GridLine.defaultProps = {
-  strokeWidth: 2,
+  strokeWidth: 1,
   color: "#7f8c8d",
+  opacity: 0.6,
   display: "inline"
 };
 
@@ -10499,12 +10500,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /* Default base palette */
-var rainbowPalette = ["#3498db", "#16a085", "#2ecc71", "#f1c40f", "#e67e22", "#c0392b", "#9b59b6"];
+var defaultPalette = ["#4cab92", "#ca0004", "#003953", "#eccc00", "#9dbd5f", "#0097bf", "#005c7a", "#fc6000"];
 
-/* Color function for testing */
-function rainbowFunc(x, y, group, i) {
-  return rainbowPalette[i % rainbowPalette.length];
-}
+/* Flat UI palette */
+var flatPalette = ["#3498db", "#16a085", "#2ecc71", "#f1c40f", "#e67e22", "#c0392b", "#9b59b6"];
 
 /* Take a base palette and return a new palette with x (= count) colors.
   Base palette must have at least 2 colors */
@@ -10588,8 +10587,8 @@ var BarGraph = function (_React$Component) {
       var axisW = barsW + 50;
       var graphW = axisW + 60;
       var legendH = 50;
-      var yLabelH = 125;
-      var axisH = this.props.graphH - (legendH + yLabelH);
+      var xLabelH = 150;
+      var axisH = this.props.graphH - (legendH + xLabelH);
 
       var maxY = 0;
       for (var i = 0; i < this.props.data.length; i++) {
@@ -10693,7 +10692,7 @@ var BarGraph = function (_React$Component) {
             return _color;
           }
         } else {
-          return this.props.color[i % palette.length];
+          return this.props.color[i % this.props.color.length];
         }
       }
     }
@@ -10716,14 +10715,17 @@ var BarGraph = function (_React$Component) {
           }
           startX = endX;
           totalIndex += this.groupCounter[i];
-          xLabels.push(_react2.default.createElement(_Labels.XLabel, { key: i, x: xLabelX, y: xLabelY, name: xValue }));
+          xLabels.push(_react2.default.createElement(_Labels.XLabel, { key: i, x: xLabelX, y: xLabelY, name: xValue,
+            color: this.props.xLabelColor, fontFamily: this.props.xLabelFont,
+            tilt: this.props.xLabelTilt, display: this.props.xLabel }));
         }
       } else {
         for (var _i = 0; _i < this.props.data.length; _i++) {
           var _xLabelX = barWidth * (_i + 0.5);
           var _xValue = this.props.data[_i][this.props.xKey];
           xLabels.push(_react2.default.createElement(_Labels.XLabel, { key: _i, x: _xLabelX, y: xLabelY, name: _xValue,
-            display: this.props.xLabel }));
+            color: this.props.xLabelColor, fontFamily: this.props.xLabelFont,
+            tilt: this.props.xLabelTilt, display: this.props.xLabel }));
         }
       }
       return xLabels;
@@ -10733,7 +10735,8 @@ var BarGraph = function (_React$Component) {
     value: function getYLabels(barScale, step, axisH) {
       var yLabels = [];
       var stepHeight = step * barScale;
-      yLabels.push(_react2.default.createElement(_Labels.YLabel, { key: axisH, y: axisH, value: 0 }));
+      yLabels.push(_react2.default.createElement(_Labels.YLabel, { key: axisH, y: axisH, value: 0, color: this.props.yLabelColor,
+        fontFamily: this.props.yLabelFont, display: this.props.yLabel }));
       for (var i = 1; i * stepHeight < axisH; i++) {
         var yLabelY = axisH - stepHeight * i;
         var yLabelVal = void 0;
@@ -10754,7 +10757,9 @@ var BarGraph = function (_React$Component) {
       var stepHeight = step * barScale;
       for (var i = stepHeight; i < axisH; i = i + stepHeight) {
         var yTickY = axisH - i;
-        yTicks.push(_react2.default.createElement(_Axes.YTick, { key: yTickY, y: yTickY, display: this.props.yTick }));
+        yTicks.push(_react2.default.createElement(_Axes.YTick, { key: yTickY, y: yTickY, strokeWidth: this.props.yTickStrokeW,
+          length: this.props.yTickLength, color: this.props.yTickColor,
+          display: this.props.yTick }));
       }
       return yTicks;
     }
@@ -10766,6 +10771,9 @@ var BarGraph = function (_React$Component) {
       for (var i = stepHeight; i < axisH; i = i + stepHeight) {
         var gridY = axisH - i;
         gridlines.push(_react2.default.createElement(_Axes.GridLine, { key: gridY, y: gridY, width: axisW,
+          strokeWidth: this.props.gridlineStrokeW,
+          color: this.props.gridlineColor,
+          opacity: this.props.gridlineOpacity,
           display: this.props.gridline }));
       }
       return gridlines;
@@ -10830,7 +10838,8 @@ var BarGraph = function (_React$Component) {
         "svg",
         { width: scales.graphW, height: this.props.graphH },
         _react2.default.createElement(_Labels.Legend, { legend: this.legendValues, width: scales.graphW,
-          height: scales.legendH, display: this.props.legend }),
+          height: scales.legendH, fontColor: this.props.legendColor,
+          fontFamily: this.props.legendFont, display: this.props.legend }),
         _react2.default.createElement(
           "g",
           { transform: axisShift },
@@ -10860,8 +10869,12 @@ var BarGraph = function (_React$Component) {
             yLabels
           ),
           _react2.default.createElement(_Axes.XAxis, { width: scales.axisW, height: scales.axisH,
+            strokeWidth: this.props.xAxisStrokeW,
+            color: this.props.xAxisColor,
             display: this.props.xAxis }),
-          _react2.default.createElement(_Axes.YAxis, { height: scales.axisH, display: this.props.yAxis })
+          _react2.default.createElement(_Axes.YAxis, { height: scales.axisH, display: this.props.yAxis,
+            strokeWidth: this.props.yAxisStrokeW,
+            color: this.props.yAxisColor })
         )
       );
     }
@@ -10873,17 +10886,31 @@ var BarGraph = function (_React$Component) {
 BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
-  color: rainbowPalette,
-  yScale: "lin",
   graphH: 600,
   maxGraphW: 800,
-  legend: "inline",
+  color: defaultPalette,
   xAxis: "inline",
+  xAxisStrokeW: 1,
+  xAxisColor: "#1b1b1b",
   yAxis: "inline",
+  yScale: "lin",
+  yAxisStrokeW: 1,
+  yAxisColor: "#1b1b1b",
   yTick: "inline",
+  yTickStrokeW: 1,
+  yTickColor: "#1b1b1b",
+  yTickLength: 6,
   gridline: "inline",
+  gridlineStrokeW: 1,
+  gridlineColor: "#7f8c8d",
+  gridlineOpacity: 0.6,
   xLabel: "inline",
-  yLabel: "inline"
+  xLabelColor: "#1b1b1b",
+  xLabelTilt: -65,
+  yLabel: "inline",
+  yLabelColor: "#1b1b1b",
+  legend: "inline",
+  legendColor: "#1b1b1b"
 };
 
 exports.default = BarGraph;
@@ -10922,7 +10949,6 @@ var XLabel = function XLabel(props) {
 
 XLabel.defaultProps = {
   color: "#1b1b1b",
-  fontFamily: "Open Sans",
   tilt: -65,
   display: "inline"
 };
@@ -10956,7 +10982,6 @@ var YLabel = function YLabel(props) {
 
 YLabel.defaultProps = {
   color: "#1b1b1b",
-  fontFamily: "Open Sans",
   display: "inline"
 };
 
@@ -10999,10 +11024,6 @@ var Legend = function Legend(props) {
 
 Legend.defaultProps = {
   fontColor: "#1b1b1b",
-  fontFamily: "Open Sans",
-  strokeColor: "#1b1b1b",
-  strokeWidth: 1,
-  background: "#ffffff",
   display: "inline"
 };
 
@@ -24522,7 +24543,7 @@ var NewRow = function (_React$Component2) {
 
       var style = {
         input: {
-          width: "80px"
+          width: "100px"
         }
       };
 
@@ -24598,7 +24619,7 @@ var ScaleSwitch = function (_React$Component3) {
     value: function render() {
       var style = {
         cell: {
-          width: "80px"
+          width: "100px"
         }
       };
 
@@ -24786,7 +24807,8 @@ var ExampleApp = function (_React$Component5) {
           updateScale: this.updateScale.bind(this) }),
         _react2.default.createElement(
           "div",
-          { style: { width: "70%", display: "inline-block" } },
+          { style: { width: "70%", display: "inline-block",
+              fontFamily: "Open Sans" } },
           _react2.default.createElement(_index2.default, { data: this.state.data, xKey: "title", yKey: "weight",
             groupKey: "group", yScale: this.state.scale })
         )

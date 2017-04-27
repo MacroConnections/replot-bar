@@ -14,7 +14,7 @@ const XAxis = (props) => {
 }
 
 XAxis.defaultProps = {
-  strokeWidth: 2,
+  strokeWidth: 1,
   color: "#1b1b1b",
   display: "inline"
 }
@@ -32,7 +32,7 @@ const YAxis = (props) => {
 }
 
 YAxis.defaultProps = {
-  strokeWidth: 2,
+  strokeWidth: 1,
   color: "#1b1b1b",
   display: "inline"
 }
@@ -64,7 +64,7 @@ const YTick = (props) => {
 }
 
 YTick.defaultProps = {
-  strokeWidth: 2,
+  strokeWidth: 1,
   length: 6,
   color: "#1b1b1b",
   display: "inline"
@@ -79,7 +79,7 @@ const GridLine = (props) => {
         y: 0,
       }}
       style={{
-        opacity: spring(1, {stiffness: 20, damping: 8}),
+        opacity: spring(props.opacity, {stiffness: 20, damping: 8}),
         y: spring(props.y, {stiffness: 140, damping: 20}),
       }}
     >
@@ -97,8 +97,9 @@ const GridLine = (props) => {
 }
 
 GridLine.defaultProps = {
-  strokeWidth: 2,
+  strokeWidth: 1,
   color: "#7f8c8d",
+  opacity: 0.6,
   display: "inline"
 }
 

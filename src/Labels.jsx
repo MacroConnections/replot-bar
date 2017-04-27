@@ -18,11 +18,9 @@ const XLabel = (props) => {
 
 XLabel.defaultProps = {
   color: "#1b1b1b",
-  fontFamily: "Open Sans",
   tilt: -65,
   display: "inline"
 }
-
 
 const YLabel = (props) => {
   return(
@@ -52,7 +50,6 @@ const YLabel = (props) => {
 
 YLabel.defaultProps = {
   color: "#1b1b1b",
-  fontFamily: "Open Sans",
   display: "inline"
 }
 
@@ -94,10 +91,6 @@ const Legend = (props) => {
 
 Legend.defaultProps = {
   fontColor: "#1b1b1b",
-  fontFamily: "Open Sans",
-  strokeColor: "#1b1b1b",
-  strokeWidth: 1,
-  background: "#ffffff",
   display: "inline"
 }
 

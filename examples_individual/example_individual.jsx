@@ -30,6 +30,81 @@ class KeyValueRow extends React.Component {
   }
 }
 
+class NewRow extends React.Component {
+  render() {
+    let title
+    let weight
+
+    const style = {
+      input: {
+        width: "100px",
+      }
+    }
+
+    return(
+      <tr>
+        <td>
+          <input style={style.input} type="text" ref={node => {title = node}}/>
+        </td>
+        <td>
+          <input style={style.input} type="text" ref={node => {weight = node}}/>
+        </td>
+        <td>
+          <button onClick={() => {
+            this.props.addData(title.value,parseInt(weight.value))
+            title.value=""
+            weight.value=""
+          }}>Add</button>
+        </td>
+      </tr>
+    )
+  }
+}
+
+class ScaleSwitch extends React.Component {
+  constructor(props) {
+    super()
+    this.state = {
+      selected: "lin"
+    }
+  }
+
+  changeHandler(e) {
+    this.setState({
+      selected: e.target.value
+    })
+    this.props.updateScale(e.target.value)
+  }
+
+  render() {
+    const style = {
+      cell: {
+        width: "100px",
+      }
+    }
+
+    return (
+      <tr>
+        <td style={style.cell} >
+          <label>
+            <input type="radio" value="lin"
+              checked={this.state.selected==="lin"}
+              onChange={this.changeHandler.bind(this)}/>
+            Linear
+          </label>
+        </td>
+        <td style={style.cell} >
+          <label>
+            <input type="radio" value="log"
+              checked={this.state.selected==="log"}
+              onChange={this.changeHandler.bind(this)} />
+            Log
+          </label>
+        </td>
+      </tr>
+    )
+  }
+}
 
 class KeyValueTable extends React.Component {
 
@@ -58,6 +133,16 @@ class KeyValueTable extends React.Component {
             {rows}
           </tbody>
         </table>
+        <table>
+          <tbody>
+            <NewRow addData={this.props.addData.bind(this)} />
+          </tbody>
+        </table>
+        <table>
+          <tbody>
+            <ScaleSwitch updateScale={this.props.updateScale.bind(this)} />
+          </tbody>
+        </table>
       </div>
     )
   }
@@ -79,7 +164,8 @@ class ExampleApp extends React.Component {
         {weight: 201, title: "Pakistan", color: "#0097bf"},
         {weight: 186, title: "Nigeria", color: "#005c7a"},
         {weight: 156, title: "Bangladesh", color: "#fc6000"},
-      ]
+      ],
+      scale: "lin"
     }
   }
 
@@ -98,13 +184,30 @@ class ExampleApp extends React.Component {
     }
   }
 
+  addData(title,weight) {
+    let mutatedData = JSON.parse(JSON.stringify(this.state.data))
+    mutatedData.push({
+      weight: weight,
+      title: title
+    })
+    this.setState({data: mutatedData})
+  }
+
+  updateScale(scale) {
+    this.setState({scale: scale})
+  }
+
   render() {
     return(
       <div className="container">
         <h1 style={{textAlign: "center"}}> Bar Graph </h1>
-        <KeyValueTable data={this.state.data} updateData={this.updateData.bind(this)} />
+        <KeyValueTable data={this.state.data}
+          updateData={this.updateData.bind(this)}
+          addData={this.addData.bind(this)}
+          updateScale={this.updateScale.bind(this)} />
         <div style={{width:"70%", display:"inline-block"}}>
-          <BarGraph data={this.state.data} xKey="title" yKey="weight"/>
+          <BarGraph data={this.state.data} xKey="title" yKey="weight"
+            yScale={this.state.scale} />
         </div>
       </div>
     )

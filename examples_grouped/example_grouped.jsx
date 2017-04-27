@@ -40,7 +40,7 @@ class NewRow extends React.Component {
 
     const style = {
       input: {
-        width: "80px",
+        width: "100px",
       }
     }
 
@@ -86,7 +86,7 @@ class ScaleSwitch extends React.Component {
   render() {
     const style = {
       cell: {
-        width: "80px",
+        width: "100px",
       }
     }
 
@@ -213,7 +213,8 @@ class ExampleApp extends React.Component {
           updateData={this.updateData.bind(this)}
           addData={this.addData.bind(this)}
           updateScale={this.updateScale.bind(this)} />
-        <div style={{width:"70%", display:"inline-block"}}>
+        <div style={{width:"70%", display:"inline-block",
+          fontFamily:"Open Sans"}}>
           <BarGraph data={this.state.data} xKey="title" yKey="weight"
             groupKey="group" yScale={this.state.scale} />
         </div>

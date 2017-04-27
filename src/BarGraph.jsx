@@ -6,6 +6,12 @@ import {XLabel, YLabel, Legend} from "./Labels.jsx"
 
 /* Default base palette */
 let defaultPalette = [
+  "#4cab92", "#ca0004", "#003953", "#eccc00",
+  "#9dbd5f", "#0097bf", "#005c7a", "#fc6000"
+]
+
+/* Flat UI palette */
+let flatPalette = [
   "#3498db","#16a085","#2ecc71","#f1c40f","#e67e22","#c0392b","#9b59b6"
 ]
 
@@ -86,10 +92,14 @@ class BarGraph extends React.Component {
     let barsW = Math.min(80 * this.props.data.length, maxBarsW)
     let axisW = barsW + 50
     let graphW = axisW + 60
-    let legendH = 50
-    let yLabelH = 125
-    let axisH = this.props.graphH - (legendH + yLabelH)
-
+    let legendH
+    if (this.props.groupKey) {
+      legendH = 50
+    } else {
+      legendH = 0
+    }
+    let xLabelH = 150
+    let axisH = this.props.graphH - (legendH + xLabelH)
 
     let maxY = 0
     for (var i = 0; i < this.props.data.length; i++) {
@@ -216,7 +226,9 @@ class BarGraph extends React.Component {
         startX = endX
         totalIndex += this.groupCounter[i]
         xLabels.push(
-          <XLabel key={i} x={xLabelX} y={xLabelY} name={xValue} />
+          <XLabel key={i} x={xLabelX} y={xLabelY} name={xValue}
+            color={this.props.xLabelColor} fontFamily={this.props.xLabelFont}
+            tilt={this.props.xLabelTilt} display={this.props.xLabel}/>
         )
       }
     } else {
@@ -225,7 +237,8 @@ class BarGraph extends React.Component {
         let xValue = this.props.data[i][this.props.xKey]
         xLabels.push(
           <XLabel key={i} x={xLabelX} y={xLabelY} name={xValue}
-            display={this.props.xLabel}/>
+            color={this.props.xLabelColor} fontFamily={this.props.xLabelFont}
+            tilt={this.props.xLabelTilt} display={this.props.xLabel}/>
         )
       }
     }
@@ -236,7 +249,8 @@ class BarGraph extends React.Component {
     let yLabels = []
     let stepHeight = step * barScale
     yLabels.push(
-      <YLabel key={axisH} y={axisH} value={0} />
+      <YLabel key={axisH} y={axisH} value={0} color={this.props.yLabelColor}
+        fontFamily={this.props.yLabelFont} display={this.props.yLabel} />
     )
     for (var i = 1; i * stepHeight < axisH; i++) {
       let yLabelY = axisH - (stepHeight * i)
@@ -260,7 +274,9 @@ class BarGraph extends React.Component {
     for (var i = stepHeight; i < axisH; i = i + stepHeight) {
       let yTickY = axisH - i
       yTicks.push(
-        <YTick key={yTickY} y={yTickY} display={this.props.yTick} />
+        <YTick key={yTickY} y={yTickY} strokeWidth={this.props.yTickStrokeW}
+          length={this.props.yTickLength} color={this.props.yTickColor}
+          display={this.props.yTick} />
       )
     }
     return yTicks
@@ -273,6 +289,9 @@ class BarGraph extends React.Component {
       let gridY = axisH - i
       gridlines.push(
         <GridLine key={gridY} y={gridY} width={axisW}
+          strokeWidth={this.props.gridlineStrokeW}
+          color={this.props.gridlineColor}
+          opacity={this.props.gridlineOpacity}
           display={this.props.gridline} />
       )
     }
@@ -338,7 +357,8 @@ class BarGraph extends React.Component {
     return (
       <svg width={scales.graphW} height={this.props.graphH}>
         <Legend legend={this.legendValues} width={scales.graphW}
-          height={scales.legendH} display={this.props.legend} />
+          height={scales.legendH} fontColor={this.props.legendColor}
+          fontFamily={this.props.legendFont} display={this.props.legend} />
         <g transform={axisShift}>
           <g>{gridlines}</g>
           <g transform={barsShift}>{barRects}</g>
@@ -346,8 +366,12 @@ class BarGraph extends React.Component {
           <g>{yTicks}</g>
           <g>{yLabels}</g>
           <XAxis width={scales.axisW} height={scales.axisH}
-            display={this.props.xAxis}/>
-          <YAxis height={scales.axisH} display={this.props.yAxis}/>
+            strokeWidth={this.props.xAxisStrokeW}
+            color={this.props.xAxisColor}
+            display={this.props.xAxis} />
+          <YAxis height={scales.axisH} display={this.props.yAxis}
+            strokeWidth={this.props.yAxisStrokeW}
+            color={this.props.yAxisColor} />
         </g>
       </svg>
     )
@@ -360,14 +384,28 @@ BarGraph.defaultProps = {
   graphH: 600,
   maxGraphW: 800,
   color: defaultPalette,
-  gridline: "inline",
   xAxis: "inline",
-  xLabel: "inline",
+  xAxisStrokeW: 1,
+  xAxisColor: "#1b1b1b",
   yAxis: "inline",
   yScale: "lin",
+  yAxisStrokeW: 1,
+  yAxisColor: "#1b1b1b",
   yTick: "inline",
+  yTickStrokeW: 1,
+  yTickColor: "#1b1b1b",
+  yTickLength: 6,
+  gridline: "inline",
+  gridlineStrokeW: 1,
+  gridlineColor: "#7f8c8d",
+  gridlineOpacity: 0.6,
+  xLabel: "inline",
+  xLabelColor: "#1b1b1b",
+  xLabelTilt: -65,
   yLabel: "inline",
-  legend: "inline"
+  yLabelColor: "#1b1b1b",
+  legend: "inline",
+  legendColor: "#1b1b1b",
 }
 
 export default BarGraph

@@ -59,23 +59,23 @@ render() {
 #### Layout
 
 * `graphH`
- * Positive number
- * Default: 600
- * Sets the height of the bar graph
+  * Positive number
+  * Default: 600
+  * Sets the height of the bar graph
 
 * `maxGraphW`
- * Positive number
- * Default: 800
- * Sets the maximum width of the bar graph
+  * Positive number
+  * Default: 800
+  * Sets the maximum width of the bar graph
 
 #### Color
 
 * `color`
- * Array of hex colors or Function of x, y, group values to hex color
- * Default: Colorization using an auto generated palette
- * Fills the bars with the iteration of colors from the array, if a color array and no group key are specified
- * Fills the bars using a palette generated based on colors from the array, if a color array and group key are specified
- * Fills the bars with the output colors, if a function is specified
+  * Array of hex colors or Function of x, y, group values to hex color
+  * Default: Colorization using an auto generated palette
+  * Fills the bars with the iteration of colors from the array, if a color array and no group key are specified
+  * Fills the bars using a palette generated based on colors from the array, if a color array and group key are specified
+  * Fills the bars with the output colors, if a function is specified
 
 ##### Example: Array of hex colors
 ```javascript
@@ -87,69 +87,166 @@ let colors = ["#2ecc71","#1abc9c","#16a085"]
 function coloring(x, y, group) {
 	if (group === "GroupA") {
 		if (x > 10 && y > 10) {
-			return "#2980b9";
+			return "#2980b9"
 		} else {
-			return "#2c3e50";
+			return "#2c3e50"
 		}
 	} else {
-		return "#95a5a6";
+		return "#95a5a6"
 	}
 }
 <BarGraph data={data} color={coloring}>
 ```
 
-#### Axes and Labels
-
-* `gridline`
- * Options: `"inline"`,`"none"`
- * Default: `"inline"`
- * Display the gridlines if "inline" is selected
- * Do not display the gridlines if "none" is selected
+#### Axes
+##### X-Axis
 
 * `xAxis`
- * Options: `"inline"`,`"none"`
- * Default: `"inline"`
- * Display the x-axis if "inline" is selected
- * Do not display the x-axis if "none" is selected
+  * Options: `"inline"`,`"none"`
+  * Default: `"inline"`
+  * Display the x-axis if "inline" is selected
+  * Do not display the x-axis if "none" is selected
 
-* `xLabel`
- * Options: `"inline"`,`"none"`
- * Default: `"inline"`
- * Display the x-axis labels if "inline" is selected
- * Do not display the x-axis labels if "none" is selected
+* `xAxisStrokeW`
+  * Options: Integer (in px)
+  * Default: 1
+  * Sets the stroke width of x-axis
+
+* `xAxisColor`
+  * Options: Hex color
+  * Default: "#1b1b1b"
+  * Sets the color of x-axis
+
+##### Y-Axis
 
 * `yAxis`
- * Options: `"inline"`,`"none"`
- * Default: `"inline"`
- * Display the y-axis if "inline" is selected
- * Do not display the y-axis if "none" is selected
+  * Options: `"inline"`,`"none"`
+  * Default: `"inline"`
+  * Display the y-axis if "inline" is selected
+  * Do not display the y-axis if "none" is selected
 
 * `yScale`
- * Options: `"lin"`,`"log"`
- * Default: `"lin"`
- * Sets the scaling of y-axis to linear if "lin" is selected
- * Sets the scaling of y-axis to logarithmic if "log" is selected
+  * Options: `"lin"`,`"log"`
+  * Default: `"lin"`
+  * Sets the scaling of y-axis to linear if "lin" is selected
+  * Sets the scaling of y-axis to logarithmic if "log" is selected
+
+* `yAxisStrokeW`
+  * Options: Integer (in px)
+  * Default: 1
+  * Sets the stroke width of y-axis
+
+* `yAxisColor`
+  * Options: Hex color
+  * Default: "#1b1b1b"
+  * Sets the color of y-axis
+
+##### Y-Ticks
 
 * `yTick`
- * Options: `"inline"`,`"none"`
- * Default: `"inline"`
- * Display the y-axis ticks if "inline" is selected
- * Do not display the y-axis ticks if "none" is selected
+  * Options: `"inline"`,`"none"`
+  * Default: `"inline"`
+  * Display the y-axis ticks if "inline" is selected
+  * Do not display the y-axis ticks if "none" is selected
+
+* `yTickStrokeW`
+  * Options: Integer (in px)
+  * Default: 1
+  * Sets the stroke width of y-ticks
+
+* `yTickColor`
+  * Options: Hex color
+  * Default: "#1b1b1b"
+  * Sets the color of y-ticks
+
+* `yTickStrokeW`
+  * Options: Integer (in px)
+  * Default: 6
+  * Sets the length of y-ticks
+
+##### Gridlines
+
+* `gridline`
+  * Options: `"inline"`,`"none"`
+  * Default: `"inline"`
+  * Display the gridlines if "inline" is selected
+  * Do not display the gridlines if "none" is selected
+
+* `gridlineStrokeW`
+  * Options: Integer (in px)
+  * Default: 1
+  * Sets the stroke width of gridlines
+
+* `gridlineColor`
+  * Options: Hex color
+  * Default: "#7f8c8d"
+  * Sets the color of gridlines
+
+* `gridlineOpacity`
+  * Options: Float (between 0 to 1)
+  * Default: 0.6
+  * Sets the opacity of gridlines
+
+#### Labels
+
+##### X-Labels
+
+* `xLabel`
+  * Options: `"inline"`,`"none"`
+  * Default: `"inline"`
+  * Display the x-axis labels if "inline" is selected
+  * Do not display the x-axis labels if "none" is selected
+
+* `xLabelColor`
+  * Options: Hex color
+  * Default: "#1b1b1b"
+  * Sets the color of x-labels
+
+* `xLabelFont`
+  * Options: String (font family name)
+  * Default: Inherits font type from the parent component
+  * Sets the font type of x-labels
+
+* `xLabelTilt`
+  * Options: Integer (in degrees)
+  * Default: -65
+  * Sets the tilt angle of x-labels
+
+##### Y-Labels
 
 * `yLabel`
- * Options: `"inline"`,`"none"`
- * Default: `"inline"`
- * Display the y-axis labels if "inline" is selected
- * Do not display the y-axis labels if "none" is selected
+  * Options: `"inline"`,`"none"`
+  * Default: `"inline"`
+  * Display the y-axis labels if "inline" is selected
+  * Do not display the y-axis labels if "none" is selected
+
+* `yLabelColor`
+  * Options: Hex color
+  * Default: "#1b1b1b"
+  * Sets the color of y-labels
+
+* `yLabelFont`
+  * Options: String (font family name)
+  * Default: Inherits font type from the parent component
+  * Sets the font type of y-labels
 
 #### Legend
 
 * `legend`
-* Options: `"inline"`,`"none"`
-* Default: `"inline"` (Legend is created only if group key is specified)
-* Display the legend if "inline" is selected
-* Do not display the legend if "none" is selected
+  * Options: `"inline"`,`"none"`
+  * Default: `"inline"` (Legend is created only if group key is specified)
+  * Display the legend if "inline" is selected
+  * Do not display the legend if "none" is selected
 
+* `legendColor`
+  * Options: Hex color
+  * Default: "#1b1b1b"
+  * Sets the font color of legend
+
+* `legend`
+  * Options: String (font family name)
+  * Default: Inherits font type from the parent component
+  * Sets the font type of legend
 
 ### Future Implementation
 

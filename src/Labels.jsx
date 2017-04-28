@@ -3,12 +3,18 @@ import {spring, Motion} from "react-motion"
 import Humanize from "humanize-plus"
 
 const XLabel = (props) => {
-  let rotation = "rotate(" + props.tilt + "," + props.x +
-    "," + props.y + ")"
+  let rotation = "rotate(" + props.tilt + "," + props.x + "," + props.y + ")"
+  let anchor
+  if (props.tilt !== 0) {
+    anchor = "end"
+  } else {
+    anchor = "middle"
+  }
+
   return(
     <text
-      x={props.x} y={props.y}
-      textAnchor="end" transform={rotation}
+      x={props.x} y={props.y} alignmentBaseline="middle"
+      textAnchor={anchor} transform={rotation}
       fill={props.color} fontFamily={props.fontFamily}
       display={props.display} >
         {props.name}

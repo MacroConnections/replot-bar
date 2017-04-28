@@ -81,6 +81,7 @@ class BarGraph extends React.Component {
   constructor(props) {
     super(props)
 
+    this.groupMargin = 32 // margin width between groups
     this.legendValues = {}
     this.groupCounter = []
     this.valueCounter = new Set()
@@ -127,7 +128,7 @@ class BarGraph extends React.Component {
     let barWidth
     if (this.props.groupKey) {
       let numGroups = this.groupCounter.length
-      barWidth = (barsW-32*(numGroups+1))/this.props.data.length
+      barWidth = (barsW-this.groupMargin*(numGroups+1))/this.props.data.length
     } else {
       barWidth = barsW/this.props.data.length
     }
@@ -162,7 +163,7 @@ class BarGraph extends React.Component {
       let group = d[this.props.groupKey]
 
       if (this.props.groupKey && prevGroup !== group) {
-        barX += barWidth + 32
+        barX += barWidth + this.groupMargin
         prevGroup = group
       } else {
         barX += barWidth
@@ -212,33 +213,55 @@ class BarGraph extends React.Component {
     let xLabels = []
     let xLabelY = axisH + 15
 
+    let longestLabel = 0 //length of the longest x label
+    for (let d of this.props.data) {
+      if (this.props.groupKey) {
+        longestLabel = Math.max(longestLabel,d[this.props.groupKey].length)
+      } else {
+        longestLabel = Math.max(longestLabel,d[this.props.xKey].length)
+      }
+    }
+
+    let tilt
+    if (this.props.xLabelTilt) {
+      tilt = this.props.xLabelTilt
+    } else {
+      let threshold = barWidth * 0.1
+      if (longestLabel < threshold) {
+        tilt = 0
+      } else {
+        tilt = -65
+      }
+    }
+
     if (this.props.groupKey) {
       let startX = 0
       let totalIndex = 0
 
       for (let i = 0; i < this.groupCounter.length; i++) {
-        let endX = startX + (this.groupCounter[i] * barWidth) + 32
-        let xLabelX = (startX + endX) / 2 + 16
+        let endX = startX + (this.groupCounter[i] * barWidth)
+          + this.groupMargin /2
+        let xLabelX = (startX + endX) / 2 + this.groupMargin /2
         let xValue = this.props.data[totalIndex][this.props.groupKey]
         if (xValue === null) {
           xValue = this.props.data[i][this.props.xKey]
         }
-        startX = endX
+        startX = endX + this.groupMargin / 2
         totalIndex += this.groupCounter[i]
         xLabels.push(
           <XLabel key={i} x={xLabelX} y={xLabelY} name={xValue}
             color={this.props.xLabelColor} fontFamily={this.props.xLabelFont}
-            tilt={this.props.xLabelTilt} display={this.props.xLabel}/>
+            tilt={tilt} display={this.props.xLabel}/>
         )
       }
     } else {
       for (let i = 0; i < this.props.data.length; i++) {
-        let xLabelX = barWidth * (i + 0.5)
+        let xLabelX = barWidth * (i + 0.4)
         let xValue = this.props.data[i][this.props.xKey]
         xLabels.push(
           <XLabel key={i} x={xLabelX} y={xLabelY} name={xValue}
             color={this.props.xLabelColor} fontFamily={this.props.xLabelFont}
-            tilt={this.props.xLabelTilt} display={this.props.xLabel}/>
+            tilt={tilt} display={this.props.xLabel}/>
         )
       }
     }
@@ -401,7 +424,6 @@ BarGraph.defaultProps = {
   gridlineOpacity: 0.6,
   xLabel: "inline",
   xLabelColor: "#1b1b1b",
-  xLabelTilt: -65,
   yLabel: "inline",
   yLabelColor: "#1b1b1b",
   legend: "inline",

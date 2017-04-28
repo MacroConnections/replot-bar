@@ -209,7 +209,7 @@ function coloring(x, y, group) {
 
 * `xLabelTilt`
   * Options: Integer (in degrees)
-  * Default: -65
+  * Default: Automatically adjust the tilt angle based on the dataset
   * Sets the tilt angle of x-labels
 
 ##### Y-Labels
@@ -285,76 +285,76 @@ render() {
 #### Layout
 
 * `align`
- * Options: `"bottom"`,`"top"`,`"left"`,`"right"`
- * Default: "bottom"
- * Sets the alignment and orientation of bars and axes.
- * Bars will be oriented vertically for bottom/top aligned graph and horizontally for left/right aligned graph.
+  * Options: `"bottom"`,`"top"`,`"left"`,`"right"`
+  * Default: "bottom"
+  * Sets the alignment and orientation of bars and axes.
+  * Bars will be oriented vertically for bottom/top aligned graph and horizontally for left/right aligned graph.
 
 * `yTicks`
- * Integer
- * Sets the number of ticks on y-axis
- * The module auto-selects the number of ticks, if not specified
+  * Integer
+  * Sets the number of ticks on y-axis
+  * The module auto-selects the number of ticks, if not specified
 
 * `barWitdh`
- * Options: `"standard"`,`"narrow"`,`"wide"`
- * Default: `"standard"`
- * Sets the style of bar width
+  * Options: `"standard"`,`"narrow"`,`"wide"`
+  * Default: `"standard"`
+  * Sets the style of bar width
 
 #### Color
 
 * `theme`
- * Options: `"auto"`,`"blue"`,`"green"`,`"yellow"`,`"orange"`,`"red"`,`"pink"`,`"purple"`
- * Default: `"auto"`
- * Sets the color theme of bar graph
- * The module auto-select the color scheme for `"auto"`
+  * Options: `"auto"`,`"blue"`,`"green"`,`"yellow"`,`"orange"`,`"red"`,`"pink"`,`"purple"`
+  * Default: `"auto"`
+  * Sets the color theme of bar graph
+  * The module auto-select the color scheme for `"auto"`
 
 * `effect`
- * Options: `"none"`,`"sequential"`,`"diverging"`,`"constant"`,`"gradient"`
- * Default: `"none"`
- * Sets the effect of bar coloring
+  * Options: `"none"`,`"sequential"`,`"diverging"`,`"constant"`,`"gradient"`
+  * Default: `"none"`
+  * Sets the effect of bar coloring
 
 #### Axes and Labels
 
- * `marker`
+* `marker`
   * Options: `"none"`,`"in"`,`"above"`
   * Default: `"none"`
   * No markers are displayed for `"none"`
   * Markers are displayed inside each bar for `"in"`
   * Markers are displayed above each bar for `"above"`
 
- * `graphTitle`
+* `graphTitle`
   * String
   * Sets the optional title for the bar graph
   * No title for the graph is set unless specified
 
- * `xTitle`
+* `xTitle`
   * String
   * Sets the optional title for the x-axis
   * No title for the x-axis is set unless specified
 
- * `yTitle`
+* `yTitle`
   * String
   * Sets the optional title for the y-axis
   * No title for the y-axis is set unless specified
 
- * `doubleAxes`
+* `doubleAxes`
   * Options: `"forbid"`, `"allow"`
   * Default: `"forbid"`
-  * Allows the module to auto-scale and display group bar graph with doble axes
+  * Allows the module to auto-scale and display group bar graph with double axes
 
 #### Legend
 
 * `barLegend`
- * Options: `"show"`,`"hidden"`
- * Default: `"hidden"`
- * Sets whether the legend for bars is displayed
+  * Options: `"show"`,`"hidden"`
+  * Default: `"hidden"`
+  * Sets whether the legend for bars is displayed
 
 * `groupLegend`
- * Options: `"show"`,`"hidden"`
- * Default: `"show"`
- * Sets whether the legend for groups are displayed, if applicable
+   * Options: `"show"`,`"hidden"`
+   * Default: `"show"`
+   * Sets whether the legend for groups are displayed, if applicable]
 
 * `stackLegend`
- * Options: `"show"`,`"hidden"`
- * Default: `"show"`
- * Sets whether the legend for stacks are displayed, if applicable
+  * Options: `"show"`,`"hidden"`
+  * Default: `"show"`
+  * Sets whether the legend for stacks are displayed, if applicable

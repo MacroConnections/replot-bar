@@ -2,7 +2,7 @@ import React from "react"
 import {spring, Motion} from "react-motion"
 import Humanize from "humanize-plus"
 import {XAxis, YAxis, YTick, GridLine} from "./Axes.jsx"
-import {XLabel, YLabel, Legend} from "./Labels.jsx"
+import {XLabel, XTitle, YLabel, YTitle, Legend} from "./Labels.jsx"
 
 /* Default base palette */
 let defaultPalette = [
@@ -89,10 +89,23 @@ class BarGraph extends React.Component {
   }
 
   calculateScale() {
-    let maxBarsW = this.props.maxGraphW - (60 + 50)
+    let yTitleW
+    if (this.props.yTitle) {
+      yTitleW = 20
+    } else {
+      yTitleW = 0
+    }
+    let maxBarsW = this.props.maxGraphW - (60 + 50 + yTitleW)
     let barsW = Math.min(80 * this.props.data.length, maxBarsW)
     let axisW = barsW + 50
-    let graphW = axisW + 60
+    let graphW = axisW + 60 + yTitleW
+
+    let xTitleH
+    if (this.props.xTitle) {
+      xTitleH = 20
+    } else {
+      xTitleH = 0
+    }
     let legendH
     if (this.props.groupKey) {
       legendH = 50
@@ -100,7 +113,7 @@ class BarGraph extends React.Component {
       legendH = 0
     }
     let xLabelH = 150
-    let axisH = this.props.graphH - (legendH + xLabelH)
+    let axisH = this.props.graphH - (legendH + xLabelH + xTitleH)
 
     let maxY = 0
     for (var i = 0; i < this.props.data.length; i++) {
@@ -141,7 +154,8 @@ class BarGraph extends React.Component {
       barScale: barScale,
       step: step,
       barWidth: barWidth,
-      legendH: legendH
+      legendH: legendH,
+      xLabelH: xLabelH
     })
   }
 
@@ -285,6 +299,8 @@ class BarGraph extends React.Component {
       }
       yLabels.push(
         <YLabel key={yLabelY} y={yLabelY} value={yLabelVal}
+          color={this.props.yLabelColor}
+          fontFamily={this.props.yLabelFont}
           display={this.props.yLabel} />
       )
     }
@@ -375,17 +391,21 @@ class BarGraph extends React.Component {
 
     let barsShift = "translate(" + ((scales.axisW - scales.barsW)/2) + ",0)"
     let axisShift = "translate(" + (scales.graphW - scales.axisW) +
-      "," + scales.legendH + ")"
+      "," + 0 + ")"
+    let legendShift = "translate(" + (scales.graphW - scales.axisW) +
+      "," + (this.props.graphH - scales.legendH) + ")"
 
     return (
       <svg width={scales.graphW} height={this.props.graphH}>
-        <Legend legend={this.legendValues} width={scales.graphW}
-          height={scales.legendH} fontColor={this.props.legendColor}
-          fontFamily={this.props.legendFont} display={this.props.legend} />
+        <YTitle x="10" y={scales.axisH/2} title={this.props.yTitle}
+          color={this.props.yTitleColor} fontFamily={this.props.yTitleFont} />
         <g transform={axisShift}>
           <g>{gridlines}</g>
           <g transform={barsShift}>{barRects}</g>
           <g transform={barsShift}>{xLabels}</g>
+          <XTitle x={scales.axisW/2} y={scales.axisH+scales.xLabelH+10}
+            title={this.props.xTitle} color={this.props.xTitleColor}
+            fontFamily={this.props.xTitleFont} />
           <g>{yTicks}</g>
           <g>{yLabels}</g>
           <XAxis width={scales.axisW} height={scales.axisH}
@@ -395,6 +415,11 @@ class BarGraph extends React.Component {
           <YAxis height={scales.axisH} display={this.props.yAxis}
             strokeWidth={this.props.yAxisStrokeW}
             color={this.props.yAxisColor} />
+        </g>
+        <g transform={legendShift}>
+          <Legend legend={this.legendValues} width={scales.axisW}
+            height={scales.legendH} fontColor={this.props.legendColor}
+            fontFamily={this.props.legendFont} display={this.props.legend} />
         </g>
       </svg>
     )
@@ -408,26 +433,28 @@ BarGraph.defaultProps = {
   maxGraphW: 800,
   color: defaultPalette,
   xAxis: "inline",
-  xAxisStrokeW: 1,
-  xAxisColor: "#1b1b1b",
-  yAxis: "inline",
+  xAxisStrokeW: 2,
+  xAxisColor: "#ffffff",
+  yAxis: "none",
   yScale: "lin",
-  yAxisStrokeW: 1,
-  yAxisColor: "#1b1b1b",
-  yTick: "inline",
+  yAxisStrokeW: 2,
+  yAxisColor: "#ffffff",
+  yTick: "none",
   yTickStrokeW: 1,
-  yTickColor: "#1b1b1b",
+  yTickColor: "#ffffff",
   yTickLength: 6,
   gridline: "inline",
   gridlineStrokeW: 1,
-  gridlineColor: "#7f8c8d",
+  gridlineColor: "#ecf0f1",
   gridlineOpacity: 0.6,
+  xTitleColor: "#ffffff",
   xLabel: "inline",
-  xLabelColor: "#1b1b1b",
+  xLabelColor: "#ffffff",
+  yTitleColor: "#ffffff",
   yLabel: "inline",
-  yLabelColor: "#1b1b1b",
+  yLabelColor: "#ffffff",
   legend: "inline",
-  legendColor: "#1b1b1b",
+  legendColor: "#ffffff",
 }
 
 export default BarGraph

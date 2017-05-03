@@ -164,12 +164,12 @@ class ExampleApp extends React.Component {
     super(props)
     this.state = {
       data: [
-        {weight: 1373, group: "China", title: "Male"},
-        {weight: 1266, group: "China", title: "Female"},
-        {weight: 323, group: "India", title: "Male"},
-        {weight: 258, group: "India", title: "Female"},
-        {weight: 205, group: "United States", title: "Male"},
-        {weight: 201, group: "United States", title: "Female"},
+        {weight: 1367, group: "China", title: 2014},
+        {weight: 1354, group: "China", title: 2012},
+        {weight: 1340, group: "China", title: 2010},
+        {weight: 317, group: "United States", title: 2014},
+        {weight: 312, group: "United States", title: 2012},
+        {weight: 308, group: "United States", title: 2010},
       ],
       scale: "lin"
     }

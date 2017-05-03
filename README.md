@@ -109,19 +109,19 @@ function coloring(x, y, group) {
 
 * `xAxisStrokeW`
   * Options: Integer (in px)
-  * Default: 1
+  * Default: 2
   * Sets the stroke width of x-axis
 
 * `xAxisColor`
   * Options: Hex color
-  * Default: "#1b1b1b"
+  * Default: "#ffffff"
   * Sets the color of x-axis
 
 ##### Y-Axis
 
 * `yAxis`
   * Options: `"inline"`,`"none"`
-  * Default: `"inline"`
+  * Default: `"none"`
   * Display the y-axis if "inline" is selected
   * Do not display the y-axis if "none" is selected
 
@@ -133,19 +133,19 @@ function coloring(x, y, group) {
 
 * `yAxisStrokeW`
   * Options: Integer (in px)
-  * Default: 1
+  * Default: 2
   * Sets the stroke width of y-axis
 
 * `yAxisColor`
   * Options: Hex color
-  * Default: "#1b1b1b"
+  * Default: "#ffffff"
   * Sets the color of y-axis
 
 ##### Y-Ticks
 
 * `yTick`
   * Options: `"inline"`,`"none"`
-  * Default: `"inline"`
+  * Default: `"none"`
   * Display the y-axis ticks if "inline" is selected
   * Do not display the y-axis ticks if "none" is selected
 
@@ -156,7 +156,7 @@ function coloring(x, y, group) {
 
 * `yTickColor`
   * Options: Hex color
-  * Default: "#1b1b1b"
+  * Default: "#ffffff"
   * Sets the color of y-ticks
 
 * `yTickStrokeW`
@@ -179,7 +179,7 @@ function coloring(x, y, group) {
 
 * `gridlineColor`
   * Options: Hex color
-  * Default: "#7f8c8d"
+  * Default: "#ecf0f1"
   * Sets the color of gridlines
 
 * `gridlineOpacity`
@@ -188,6 +188,40 @@ function coloring(x, y, group) {
   * Sets the opacity of gridlines
 
 #### Labels
+
+##### X-Title
+
+* `xTitle`
+  * Options: String
+  * Default: No x-axis title
+  * Sets the title for the x-axis
+
+* `xTitleColor`
+  * Options: Hex color
+  * Default: "#ffffff"
+  * Sets the color of x-axis title
+
+* `xTitleFont`
+  * Options: String (font family name)
+  * Default: Inherits font type from the parent component
+  * Sets the font type of x-axis title
+
+##### Y-Title
+
+* `yTitle`
+  * Options: String
+  * Default: No y-axis title
+  * Sets the title for the y-axis
+
+* `yTitleColor`
+  * Options: Hex color
+  * Default: "#ffffff"
+  * Sets the color of y-axis title
+
+* `yTitleFont`
+  * Options: String (font family name)
+  * Default: Inherits font type from the parent component
+  * Sets the font type of y-axis title
 
 ##### X-Labels
 
@@ -199,7 +233,7 @@ function coloring(x, y, group) {
 
 * `xLabelColor`
   * Options: Hex color
-  * Default: "#1b1b1b"
+  * Default: "#ffffff"
   * Sets the color of x-labels
 
 * `xLabelFont`
@@ -222,7 +256,7 @@ function coloring(x, y, group) {
 
 * `yLabelColor`
   * Options: Hex color
-  * Default: "#1b1b1b"
+  * Default: "#ffffff"
   * Sets the color of y-labels
 
 * `yLabelFont`
@@ -240,10 +274,10 @@ function coloring(x, y, group) {
 
 * `legendColor`
   * Options: Hex color
-  * Default: "#1b1b1b"
+  * Default: "#ffffff"
   * Sets the font color of legend
 
-* `legend`
+* `legendFont`
   * Options: String (font family name)
   * Default: Inherits font type from the parent component
   * Sets the font type of legend
@@ -326,16 +360,6 @@ render() {
   * String
   * Sets the optional title for the bar graph
   * No title for the graph is set unless specified
-
-* `xTitle`
-  * String
-  * Sets the optional title for the x-axis
-  * No title for the x-axis is set unless specified
-
-* `yTitle`
-  * String
-  * Sets the optional title for the y-axis
-  * No title for the y-axis is set unless specified
 
 * `doubleAxes`
   * Options: `"forbid"`, `"allow"`

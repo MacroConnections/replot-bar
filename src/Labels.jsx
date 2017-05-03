@@ -28,6 +28,46 @@ XLabel.defaultProps = {
   display: "inline"
 }
 
+
+const XTitle = (props) => {
+  if (!props.title) {
+    return null
+  }
+
+  return(
+    <text
+      x={props.x} y={props.y} alignmentBaseline="middle"
+      textAnchor="middle" fill={props.color}
+      fontFamily={props.fontFamily} >
+        {props.title}
+    </text>
+  )
+}
+
+XTitle.defaultProps = {
+  color: "#1b1b1b"
+}
+
+
+const YTitle = (props) => {
+  if (!props.title) {
+    return null
+  }
+
+  return(
+    <text
+      x={props.x} y={props.y} alignmentBaseline="middle"
+      textAnchor="middle" transform={"rotate(-90,"+props.x+","+props.y+")"}
+      fill={props.color} fontFamily={props.fontFamily} >
+        {props.title}
+    </text>
+  )
+}
+
+YTitle.defaultProps = {
+  color: "#1b1b1b"
+}
+
 const YLabel = (props) => {
   return(
     <Motion
@@ -63,19 +103,19 @@ YLabel.defaultProps = {
 const Legend = (props) => {
   let titles = Object.keys(props.legend).sort()
   let items = []
-  let size = Math.min(20, (props.height / Math.ceil(titles.length/4)) / 1.5)
+  let size = 16
   for (var i=0; i<titles.length; i++) {
     let title = titles[i]
     if (title) {
       let y = (Math.floor(i/4) * 1.5) * size
-      let x = (i % 4) * (props.width / 4)
+      let x = props.width/4 * (i%4)
       items.push(
         <g key={props.legend[title]}>
            <rect x={x} y={y} width={size} height={size}
              fill={props.legend[title]} />
           <text x={x+1.5*size} y={y+(size/2)}
             alignmentBaseline="middle" fontSize={size}
-            fontFamily={props.fontFamily}>
+            fill={props.fontColor} fontFamily={props.fontFamily}>
               {title}
           </text>
         </g>
@@ -102,6 +142,8 @@ Legend.defaultProps = {
 
 module.exports = {
   XLabel,
+  XTitle,
   YLabel,
+  YTitle,
   Legend,
 }

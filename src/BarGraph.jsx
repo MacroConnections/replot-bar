@@ -116,8 +116,17 @@ class BarGraph extends React.Component {
     let axisH = this.props.graphH - (legendH + xLabelH + xTitleH)
 
     let maxY = 0
+    let currY
     for (var i = 0; i < this.props.data.length; i++) {
-      let currY = this.props.data[i][this.props.yKey]
+      let d = this.props.data[i]
+      if (typeof this.props.data[i][this.props.yKey] === "number") {
+        currY = d[this.props.yKey]
+      } else {
+        currY = 0
+        for (var j = 0; j < this.props.stackKey.length; j++) {
+          currY += d[this.props.yKey][this.props.stackKey[j]]
+        }
+      }
       if (currY > maxY) {
         maxY = currY
       }
@@ -165,6 +174,7 @@ class BarGraph extends React.Component {
     let width = barWidth - padding
     let barX = -barWidth
     let prevGroup = null
+    let barXX = 0
 
     if (this.props.groupKey && typeof(this.props.color) !== "function") {
       this.palette = getPalette(this.props.color,this.valueCounter.size)
@@ -174,29 +184,73 @@ class BarGraph extends React.Component {
       let d = this.props.data[i]
       let xVal = d[this.props.xKey]
       let yVal = d[this.props.yKey]
-      let group = d[this.props.groupKey]
+      //TODO: Stacked Bar Graph
+      //Check if yVal is a number or JSON object
+      //if yVal === JSON object, get subbars from object and generate stackkey and add together all values for height
+      //if yval === number, use that number
+      if (typeof yVal === "number") {
 
-      if (this.props.groupKey && prevGroup !== group) {
-        barX += barWidth + this.groupMargin
-        prevGroup = group
+        let group = d[this.props.groupKey]
+
+        if (this.props.groupKey && prevGroup !== group) {
+          barX += barWidth + this.groupMargin
+          prevGroup = group
+        } else {
+          barX += barWidth
+        }
+
+        let height
+        if (this.props.yScale === "log") {
+          height = Math.log10(yVal) * barScale
+        } else {
+          height = yVal * barScale // linear scale
+        }
+        let color = this.colorBar(xVal,yVal,group,i)
+
+        bars.push(
+          <Bar
+            key={barX} x={barX} axisHeight={axisH}
+            width={width} height={height} color={color} />
+        )
       } else {
-        barX += barWidth
+        let stackTotal = 0
+        for (let k = 0; k < this.props.stackKey.length; k++) {
+          stackTotal += yVal[this.props.stackKey[k]]
+        }
+        let stackYVal = stackTotal
+        for (let j = 0; j < this.props.stackKey.length; j++) {
+
+          let group = d[this.props.groupKey]
+
+          if (this.props.groupKey && prevGroup !== group) {
+            barX += barWidth + this.groupMargin
+            prevGroup = group
+          } else {
+            barX += barWidth
+          }
+
+          let height
+          if (this.props.yScale === "log") {
+            height = Math.log10(stackYVal) * barScale
+          } else {
+            height = stackYVal * barScale
+          }
+          let color = this.colorBar(xVal,stackYVal, group, j)
+
+          bars.push(
+            <Bar
+              key={barX} x={barXX} axisHeight={axisH}
+              width={width} height={height} color={color} />
+          )
+          stackYVal -= yVal[this.props.stackKey[j]]
+        }
+        if (this.props.groupKey && prevGroup !== group) {
+          barXX += barWidth + this.groupMargin
+          prevGroup = group
+        } else {
+          barXX += barWidth
+        }
       }
-
-      let height
-      if (this.props.yScale === "log") {
-        height = Math.log10(yVal) * barScale
-      } else {
-        height = yVal * barScale // linear scale
-      }
-
-      let color = this.colorBar(xVal,yVal,group,i)
-
-      bars.push(
-        <Bar
-          key={barX} x={barX} axisHeight={axisH}
-          width={width} height={height} color={color} />
-      )
     }
     return bars
   }
@@ -429,6 +483,7 @@ class BarGraph extends React.Component {
 BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
+  stackKey: "stacks",
   graphH: 600,
   maxGraphW: 800,
   color: defaultPalette,

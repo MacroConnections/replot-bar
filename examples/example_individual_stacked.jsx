@@ -7,7 +7,7 @@ class KeyValueRow extends React.Component {
   changeHandler(e) {
     this.props.updateData({
       title: this.props.title,
-      weight: e.target.value
+      weight: e.target.value,
     })
   }
 
@@ -22,7 +22,11 @@ class KeyValueRow extends React.Component {
       <tr key={this.props.title}>
         <td style={style.cell}>{this.props.title} </td>
         <td style={style.cell}>
-          <input type="text" value={parseInt(this.props.weight)}
+          <input type="text" value={parseInt(this.props.weight["one"])}
+            onChange={this.changeHandler.bind(this)} />
+          <input type="text" value={parseInt(this.props.weight["two"])}
+            onChange={this.changeHandler.bind(this)} />
+          <input type="text" value={parseInt(this.props.weight["three"])}
             onChange={this.changeHandler.bind(this)} />
         </td>
       </tr>
@@ -155,15 +159,24 @@ class ExampleApp extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      // data: [
+      //   {weight: {male: 123, female: 231}, title: "China"},
+      //   {weight: {male: 342, female: 234}, title: "India"},
+      //   {weight: {male: 300, female: 542}, title: "United States"},
+      //   {weight: {male: 200, female: 532}, title: "Indonesia"},
+      //   {weight: {male: 322, female: 120}, title: "Brazil"},
+      //   {weight: {male: 129, female: 112}, title: "Pakistan"},
+      //   {weight: {male: 201, female: 102}, title: "Nigeria"},
+      //   {weight: {male: 231, female: 210}, title: "Bangladesh"},
+      // ],
       data: [
-        {weight: {male: 123, female: 231}, title: "China", color: "#4cab92"},
-        {weight: {male: 342, female: 234}, title: "India", color: "#ca0004"},
-        {weight: {male: 300, female: 542}, title: "United States", color: "#003953"},
-        {weight: {male: 200, female: 532}, title: "Indonesia", color: "#eccc00"},
-        {weight: {male: 322, female: 120}, title: "Brazil", color: "#9dbd5f"},
-        {weight: {male: 129, female: 112}, title: "Pakistan", color: "#0097bf"},
-        {weight: {male: 201, female: 102}, title: "Nigeria", color: "#005c7a"},
-        {weight: {male: 231, female: 210}, title: "Bangladesh", color: "#fc6000"},
+        {weight:{one: 90, two: 225, three: 300}, title:"test 1"},
+        {weight:{one: 35, two: 45, three: 75}, title:"test 2"},
+        {weight:{one: 150, two: 225, three: 35}, title:"test 3"},
+        {weight:{one: 135, two: 220, three: 330}, title:"test 4"},
+        {weight:{one: 105, two: 25, three: 310}, title:"test 5"},
+        {weight:{one: 10, two: 25, three: 350}, title:"test 6"},
+        {weight:{one: 110, two: 120, three: 130}, title:"test 7"},
       ],
       scale: "lin"
     }
@@ -184,7 +197,7 @@ class ExampleApp extends React.Component {
     }
   }
 
-  addData(title,weight) {
+  addData(title,one, two, three) {
     let mutatedData = JSON.parse(JSON.stringify(this.state.data))
     mutatedData.push({
       weight: weight,
@@ -198,6 +211,8 @@ class ExampleApp extends React.Component {
   }
 
   render() {
+    let keySetA = ["male", "female"]
+    let keySetB = ["one", "two", "three"]
     return(
       <div className="container">
         <h1 style={{textAlign: "center"}}> Bar Graph </h1>
@@ -206,7 +221,7 @@ class ExampleApp extends React.Component {
           addData={this.addData.bind(this)}
           updateScale={this.updateScale.bind(this)} />
         <div style={{width:"70%", display:"inline-block"}}>
-          <BarGraph data={this.state.data} xKey="title" yKey="weight" stackKey={["male","female"]}
+          <BarGraph data={this.state.data} xKey="title" yKey="weight" stackKey={keySetB}
             yScale={this.state.scale} xTitle="country" yTitle="population"/>
         </div>
       </div>

@@ -1684,7 +1684,7 @@ var BarGraph = function (_React$Component) {
       if (this.props.xLabelTilt) {
         tilt = this.props.xLabelTilt;
       } else {
-        var threshold = barWidth * 0.1;
+        var threshold = (this.groupCounter.length + 1) * barWidth * 0.1;
         if (longestLabel < threshold) {
           tilt = 0;
         } else {

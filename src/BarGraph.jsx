@@ -240,7 +240,7 @@ class BarGraph extends React.Component {
     if (this.props.xLabelTilt) {
       tilt = this.props.xLabelTilt
     } else {
-      let threshold = barWidth * 0.1
+      let threshold = (this.groupCounter.length + 1) * barWidth * 0.1
       if (longestLabel < threshold) {
         tilt = 0
       } else {

@@ -3,6 +3,7 @@ import {spring, Motion} from "react-motion"
 import Humanize from "humanize-plus"
 import {XAxis, YAxis, YTick, GridLine} from "./Axes.jsx"
 import {XLabel, XTitle, YLabel, YTitle, Legend} from "./Labels.jsx"
+import PropTypes from "prop-types"
 
 /* Default base palette */
 let defaultPalette = [
@@ -455,6 +456,38 @@ BarGraph.defaultProps = {
   yLabelColor: "#ffffff",
   legend: "inline",
   legendColor: "#ffffff",
+}
+
+BarGraph.propTypes = {
+  data: PropTypes.array.isRequired,
+  xKey: PropTypes.string,
+  yKey: PropTypes.string,
+  graphH: PropTypes.number,
+  maxGraphW: PropTypes.number,
+  color: defaultPalette,
+  xAxis: PropTypes.string,
+  xAxisStrokeW: PropTypes.number,
+  xAxisColor: PropTypes.string,
+  yAxis: PropTypes.string,
+  yScale: PropTypes.string,
+  yAxisStrokeW: PropTypes.number,
+  yAxisColor: PropTypes.string,
+  yTick: PropTypes.string,
+  yTickStrokeW: PropTypes.number,
+  yTickColor: PropTypes.string,
+  yTickLength: PropTypes.number,
+  gridline: PropTypes.string,
+  gridlineStrokeW: PropTypes.number,
+  gridlineColor: PropTypes.string,
+  gridlineOpacity: PropTypes.number,
+  xTitleColor: PropTypes.string,
+  xLabel: PropTypes.string,
+  xLabelColor: PropTypes.string,
+  yTitleColor: PropTypes.string,
+  yLabel: PropTypes.string,
+  yLabelColor: PropTypes.string,
+  legend: PropTypes.string,
+  legendColor: PropTypes.string,
 }
 
 export default BarGraph

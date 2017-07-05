@@ -1927,7 +1927,7 @@ BarGraph.propTypes = {
   yKey: _propTypes2.default.string,
   graphH: _propTypes2.default.number,
   maxGraphW: _propTypes2.default.number,
-  color: defaultPalette,
+  color: PropType.array,
   xAxis: _propTypes2.default.string,
   xAxisStrokeW: _propTypes2.default.number,
   xAxisColor: _propTypes2.default.string,

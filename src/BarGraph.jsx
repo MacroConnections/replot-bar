@@ -464,7 +464,7 @@ BarGraph.propTypes = {
   yKey: PropTypes.string,
   graphH: PropTypes.number,
   maxGraphW: PropTypes.number,
-  color: defaultPalette,
+  color: PropTypes.array,
   xAxis: PropTypes.string,
   xAxisStrokeW: PropTypes.number,
   xAxisColor: PropTypes.string,

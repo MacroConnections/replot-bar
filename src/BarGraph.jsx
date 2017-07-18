@@ -96,8 +96,8 @@ class BarGraph extends React.Component {
     } else {
       yTitleW = 0
     }
-    let maxBarsW = this.props.maxGraphW - (60 + 50 + yTitleW)
-    let barsW = Math.min(80 * this.props.data.length, maxBarsW)
+    let minBarsW = Math.max((this.props.width - (60 + 50 + yTitleW)), (yTitleW + 10))
+    let barsW = Math.min(this.props.width, minBarsW)
     let axisW = barsW + 50
     let graphW = axisW + 60 + yTitleW
 
@@ -114,7 +114,10 @@ class BarGraph extends React.Component {
       legendH = 0
     }
     let xLabelH = 150
-    let axisH = this.props.graphH - (legendH + xLabelH + xTitleH)
+    let axisH = this.props.height - (legendH + xLabelH + xTitleH)
+    if (axisH <= 0) {
+      axisH = 20
+    }
 
     let maxY = 0
     for (var i = 0; i < this.props.data.length; i++) {
@@ -394,17 +397,17 @@ class BarGraph extends React.Component {
     let axisShift = "translate(" + (scales.graphW - scales.axisW) +
       "," + 0 + ")"
     let legendShift = "translate(" + (scales.graphW - scales.axisW) +
-      "," + (this.props.graphH - scales.legendH) + ")"
+      "," + (scales.axisH - scales.legendH) + ")"
 
     return (
-      <svg width={scales.graphW} height={this.props.graphH}>
+      <svg width={scales.graphW} height={this.props.height}>
         <YTitle x="10" y={scales.axisH/2} title={this.props.yTitle}
           color={this.props.yTitleColor} fontFamily={this.props.yTitleFont} />
         <g transform={axisShift}>
           <g>{gridlines}</g>
           <g transform={barsShift}>{barRects}</g>
           <g transform={barsShift}>{xLabels}</g>
-          <XTitle x={scales.axisW/2} y={scales.axisH+scales.xLabelH+10}
+          <XTitle x={scales.axisW/2} y={scales.axisH+scales.xLabelH-30}
             title={this.props.xTitle} color={this.props.xTitleColor}
             fontFamily={this.props.xTitleFont} />
           <g>{yTicks}</g>
@@ -430,8 +433,8 @@ class BarGraph extends React.Component {
 BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
-  graphH: 600,
-  maxGraphW: 800,
+  height: 600,
+  width: 800,
   color: defaultPalette,
   xAxis: "inline",
   xAxisStrokeW: 2,
@@ -462,8 +465,8 @@ BarGraph.propTypes = {
   data: PropTypes.array.isRequired,
   xKey: PropTypes.string,
   yKey: PropTypes.string,
-  graphH: PropTypes.number,
-  maxGraphW: PropTypes.number,
+  height: PropTypes.number,
+  width: PropTypes.number,
   color: PropTypes.array,
   xAxis: PropTypes.string,
   xAxisStrokeW: PropTypes.number,

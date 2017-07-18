@@ -146,6 +146,9 @@ class BarGraph extends React.Component {
     if (this.props.groupKey) {
       let numGroups = this.groupCounter.length
       barWidth = (barsW-this.groupMargin*(numGroups+1))/this.props.data.length
+      if (barWidth <= 0) {
+        barWidth = 1
+      }
     } else {
       barWidth = barsW/this.props.data.length
     }
@@ -297,7 +300,7 @@ class BarGraph extends React.Component {
       let yLabelY = axisH - (stepHeight * i)
       let yLabelVal
       if (this.props.yScale === "log") {
-        yLabelVal = "e+" + (step*i)
+        yLabelVal = 10 ** (step*i)
       } else {
         yLabelVal = Humanize.compactInteger(step*i,1) // linear scale
       }
@@ -396,8 +399,8 @@ class BarGraph extends React.Component {
     let barsShift = "translate(" + ((scales.axisW - scales.barsW)/2) + ",0)"
     let axisShift = "translate(" + (scales.graphW - scales.axisW) +
       "," + 0 + ")"
-    let legendShift = "translate(" + (scales.graphW - scales.axisW) +
-      "," + (scales.axisH - scales.legendH) + ")"
+    let legendShift = "translate(" + (scales.graphW - scales.axisW + (this.props.width/7.5)) +
+      "," + (this.props.height - scales.legendH - 20) + ")"
 
     return (
       <svg width={scales.graphW} height={this.props.height}>
@@ -407,7 +410,7 @@ class BarGraph extends React.Component {
           <g>{gridlines}</g>
           <g transform={barsShift}>{barRects}</g>
           <g transform={barsShift}>{xLabels}</g>
-          <XTitle x={scales.axisW/2} y={scales.axisH+scales.xLabelH-30}
+          <XTitle x={scales.axisW/2.12} y={scales.axisH+scales.xLabelH-30}
             title={this.props.xTitle} color={this.props.xTitleColor}
             fontFamily={this.props.xTitleFont} />
           <g>{yTicks}</g>

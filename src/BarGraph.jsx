@@ -3,6 +3,7 @@ import {spring, Motion} from "react-motion"
 import Humanize from "humanize-plus"
 import {XAxis, YAxis, YTick, GridLine} from "./Axes.jsx"
 import {XLabel, XTitle, YLabel, YTitle, Legend} from "./Labels.jsx"
+import Resize from "../../replot-core/src/Resize.jsx"
 import PropTypes from "prop-types"
 
 /* Default base palette */
@@ -433,6 +434,19 @@ class BarGraph extends React.Component {
   }
 }
 
+class BarGraphResponsive extends React.Component {
+
+  render() {
+    let child = React.cloneElement(<BarGraph data={this.props.data}/>, this.props)
+
+    return (
+      <Resize>
+        {child}
+      </Resize>
+    )
+  }
+}
+
 BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
@@ -469,7 +483,7 @@ BarGraph.propTypes = {
   xKey: PropTypes.string,
   yKey: PropTypes.string,
   height: PropTypes.number,
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   color: PropTypes.array,
   xAxis: PropTypes.string,
   xAxisStrokeW: PropTypes.number,
@@ -496,4 +510,4 @@ BarGraph.propTypes = {
   legendColor: PropTypes.string,
 }
 
-export default BarGraph
+export default BarGraphResponsive

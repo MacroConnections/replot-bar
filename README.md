@@ -1,7 +1,18 @@
-# Replot x Bar
+# replot-bar
 Intelligent and customizable bar graph components for React projects.
 
 ## Installation
+Only works with React projects. React must be installed separately.
+```bash
+npm install replot-bar
+```
+
+Then with a module bundler like webpack/browserify that supports CommonJS/ES2015
+modules, use as you would anything else.
+
+```javascript
+import BarGraph from 'replot-bar'
+```
 
 ## API
 
@@ -58,12 +69,12 @@ render() {
 
 #### Layout
 
-* `graphH`
+* `height`
   * Positive number
   * Default: 600
   * Sets the height of the bar graph
 
-* `maxGraphW`
+* `width`
   * Positive number
   * Default: 800
   * Sets the maximum width of the bar graph
@@ -376,7 +387,7 @@ render() {
 * `groupLegend`
    * Options: `"show"`,`"hidden"`
    * Default: `"show"`
-   * Sets whether the legend for groups are displayed, if applicable]
+   * Sets whether the legend for groups are displayed, if applicable
 
 * `stackLegend`
   * Options: `"show"`,`"hidden"`

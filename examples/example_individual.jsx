@@ -207,7 +207,7 @@ class ExampleApp extends React.Component {
           updateScale={this.updateScale.bind(this)} />
         <div style={{width:"70%", display:"inline-block"}}>
           <BarGraph data={this.state.data} xKey="title" yKey="weight"
-            yScale={this.state.scale} xTitle="country" yTitle="population"/>
+            yScale={this.state.scale} xTitle="country" yTitle="population" />
         </div>
       </div>
     )

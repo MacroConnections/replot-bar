@@ -3,7 +3,7 @@ import {spring, Motion} from "react-motion"
 import Humanize from "humanize-plus"
 import {XAxis, YAxis, YTick, GridLine} from "./Axes.jsx"
 import {XLabel, XTitle, YLabel, YTitle, Legend} from "./Labels.jsx"
-import Resize from "../../replot-core/src/Resize.jsx"
+import {Resize} from "replot-core"
 import PropTypes from "prop-types"
 
 /* Default base palette */
@@ -437,21 +437,23 @@ class BarGraph extends React.Component {
 class BarGraphResponsive extends React.Component {
 
   render() {
-    let child = React.cloneElement(<BarGraph data={this.props.data}/>, this.props)
 
     return (
-      <Resize>
-        {child}
+      <Resize width={this.props.width}>
+        <BarGraph {...this.props} />
       </Resize>
     )
   }
+}
+
+BarGraphResponsive.defaultProps = {
+  width: 800
 }
 
 BarGraph.defaultProps = {
   xKey: "x",
   yKey: "y",
   height: 600,
-  width: 800,
   color: defaultPalette,
   xAxis: "inline",
   xAxisStrokeW: 2,

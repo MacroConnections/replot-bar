@@ -4,48 +4,6 @@ import {spring, Motion} from "react-motion"
 import {Axis, Resize} from "replot-core"
 
 
-/* Take a base palette and return a new palette with x (= count) colors.
-  Base palette must have at least 2 colors */
-// function getPalette(basePalette,count) {
-//   let oldPalette = basePalette
-//   let newPalette = basePalette.slice(0)
-//   let i = 1
-//   while (newPalette.length < count) {
-//     if (i >= oldPalette.length) {
-//       oldPalette = newPalette
-//       newPalette = oldPalette.slice(0)
-//       i = 1
-//     }
-//     let midColor = centerColor(oldPalette[i-1],oldPalette[i])
-//     newPalette.splice(2*i-1,0,midColor)
-//     i += 1
-//   }
-//   return newPalette
-// }
-//
-//
-// function centerColor(colorA,colorB) {
-//   let rA = parseInt(colorA.substring(1,3), 16)
-//   let rB = parseInt(colorB.substring(1,3), 16)
-//   let gA = parseInt(colorA.substring(3,5), 16)
-//   let gB = parseInt(colorB.substring(3,5), 16)
-//   let bA = parseInt(colorA.substring(5,7), 16)
-//   let bB = parseInt(colorB.substring(5,7), 16)
-//   let r = Math.round((rA + rB) / 2).toString(16)
-//   let g = Math.round((gA + gB) / 2).toString(16)
-//   let b = Math.round((bA + bB) / 2).toString(16)
-//   while (r.length < 2) {
-//     r = "0" + r
-//   }
-//   while (g.length < 2) {
-//     g = "0" + g
-//   }
-//   while (b.length < 2) {
-//     b = "0" + b
-//   }
-//   return "#" + r + g + b
-// }
-
 class Bar extends React.Component {
 
   render() {
@@ -59,11 +17,49 @@ class Bar extends React.Component {
         {
           style =>
             <rect
-              x={this.props.x} y={this.props.height-style.height}
+              x={this.props.x} y={this.props.y-style.height}
               width={this.props.width} height={style.height}
               fill={this.props.color} />
         }
       </Motion>
+    )
+  }
+}
+
+class BarContainer extends React.Component {
+
+  render() {
+    let series = []
+    let unit
+    if (this.props.yScale === "log") {
+      unit = this.props.height / Math.log10(this.props.max)
+    } else {
+      unit = this.props.height / this.props.max
+    }
+    let barX, barHeight
+    let barWidth = 50
+
+    let dataPoint
+    for (let i = 0; i < this.props.groups.length; i++) {
+      barX = (this.props.width/this.props.groups.length/2) + (i*this.props.width/this.props.groups.length)
+      dataPoint = this.props.data[i]
+      if (this.props.yScale === "log") {
+        barHeight = (Math.log10(this.props.max)-Math.log10(this.props.dataPoint[this.props.yKey])) * unit
+      } else {
+        barHeight = (dataPoint[this.props.yKey]) * unit
+      }
+      series.push(
+        <Bar key={"bar" + i}
+          x={barX-(barWidth/2)} y={this.props.height-this.props.vertOffset}
+          width={barWidth} height={barHeight}
+          color={this.props.color(i, this.props.groups[i])}/>
+      )
+    }
+
+    return (
+      <g>
+        {series}
+      </g>
     )
   }
 }
@@ -334,91 +330,138 @@ class BarGraph extends React.Component {
   //   }
   //   return gridlines
   // }
+  getLegend(){
+    let groups = [...new Set(this.props.data.map(item => item[this.props.xKey]))]
+    let legendValues = {}
+    for (let i = 0; i < groups.length; i++) {
+      legendValues[groups[i]] = this.colorBar(i, groups[i])
+    }
+    return legendValues
+  }
+
+  colorBar(i, group) {
+    if (this.props.color instanceof Array) {
+      return this.props.color[i%this.props.color.length]
+    } else {
+      return this.props.color(i, group)
+    }
+  }
 
   render() {
-    let groupKey = this.props.groupKey
-    let xKey = this.props.xKey
-
-    this.props.data.sort(function(a, b){
-      let aGroupKey = a[groupKey]
-      let bGroupKey = b[groupKey]
-      let aXKey = a[xKey]
-      let bXKey = b[xKey]
-      if (groupKey && aGroupKey < bGroupKey) {
-        return -1
-      } else if (groupKey && aGroupKey > bGroupKey) {
-        return 1
-      } else if (aXKey < bXKey) {
-        return -1
-      } else if (aXKey > bXKey) {
-        return 1
-      } else {
-        return 0
-      }
-    })
-
-    if (groupKey) {
-      let groupIndex = 0 // first group
-      this.groupCounter = [1] // first item in first group
-      this.valueCounter.add(this.props.data[0][xKey])
-      for (let i = 1; i < this.props.data.length; i++) {
-        if (this.props.data[i-1][groupKey] !== this.props.data[i][groupKey]) {
-          groupIndex += 1
-          this.groupCounter[groupIndex] = 1
-        } else {
-          this.groupCounter[groupIndex] += 1
-        }
-        this.valueCounter.add(this.props.data[i][xKey])
-      }
+    let groups
+    if (this.props.groupKey) {
+      groups = [...new Set(this.props.data.map(item => item[this.props.groupKey]))]
+    } else {
+      groups = [...new Set(this.props.data.map(item => item[this.props.xKey]))]
     }
 
-    this.legendValues = {}
+    let yVals = this.props.data.map(item => item[this.props.yKey])
+    let maxY = Math.max(...yVals)
+    let padY = maxY / 5
 
-    let scales = this.calculateScale()
+    // let groupKey = this.props.groupKey
+    // let xKey = this.props.xKey
+    //
+    // this.props.data.sort(function(a, b){
+    //   let aGroupKey = a[groupKey]
+    //   let bGroupKey = b[groupKey]
+    //   let aXKey = a[xKey]
+    //   let bXKey = b[xKey]
+    //   if (groupKey && aGroupKey < bGroupKey) {
+    //     return -1
+    //   } else if (groupKey && aGroupKey > bGroupKey) {
+    //     return 1
+    //   } else if (aXKey < bXKey) {
+    //     return -1
+    //   } else if (aXKey > bXKey) {
+    //     return 1
+    //   } else {
+    //     return 0
+    //   }
+    // })
+    //
+    // if (groupKey) {
+    //   let groupIndex = 0 // first group
+    //   this.groupCounter = [1] // first item in first group
+    //   this.valueCounter.add(this.props.data[0][xKey])
+    //   for (let i = 1; i < this.props.data.length; i++) {
+    //     if (this.props.data[i-1][groupKey] !== this.props.data[i][groupKey]) {
+    //       groupIndex += 1
+    //       this.groupCounter[groupIndex] = 1
+    //     } else {
+    //       this.groupCounter[groupIndex] += 1
+    //     }
+    //     this.valueCounter.add(this.props.data[i][xKey])
+    //   }
+    // }
+    //
+    // this.legendValues = {}
+    //
+    // let scales = this.calculateScale()
+    //
+    // let barRects = this.getBars(scales.barScale, scales.barWidth, scales.axisH)
+    //
+    // let xLabels = this.getXLabels(scales.barWidth, scales.axisH)
+    //
+    // let yLabels = this.getYLabels(scales.barScale, scales.step, scales.axisH)
+    //
+    // let yTicks = this.getYTicks(scales.barScale, scales.step, scales.axisH)
+    //
+    // let gridlines = this.getGridlines(scales.barScale, scales.step,
+    //   scales.axisW, scales.axisH)
+    //
+    // let barsShift = "translate(" + ((scales.axisW - scales.barsW)/2) + ",0)"
+    // let axisShift = "translate(" + (scales.graphW - scales.axisW) +
+    //   "," + 0 + ")"
+    // let legendShift = "translate(" + (scales.graphW - scales.axisW + (this.props.width/7.5)) +
+    //   "," + (this.props.height - scales.legendH - 20) + ")"
 
-    let barRects = this.getBars(scales.barScale, scales.barWidth, scales.axisH)
+    // <YTitle x="10" y={scales.axisH/2} title={this.props.yTitle}
+    //   color={this.props.yTitleColor} fontFamily={this.props.yTitleFont} />
+    // <g transform={axisShift}>
+    //   <g>{gridlines}</g>
+    //   <g transform={barsShift}>{barRects}</g>
+    //   <g transform={barsShift}>{xLabels}</g>
+    //   <XTitle x={scales.axisW/2.12} y={scales.axisH+scales.xLabelH-30}
+    //     title={this.props.xTitle} color={this.props.xTitleColor}
+    //     fontFamily={this.props.xTitleFont} />
+    //   <g>{yTicks}</g>
+    //   <g>{yLabels}</g>
+    //   <XAxis width={scales.axisW} height={scales.axisH}
+    //     strokeWidth={this.props.xAxisStrokeW}
+    //     color={this.props.xAxisColor}
+    //     display={this.props.xAxis} />
+    //   <YAxis height={scales.axisH} display={this.props.yAxis}
+    //     strokeWidth={this.props.yAxisStrokeW}
+    //     color={this.props.yAxisColor} />
+    // </g>
+    // <g transform={legendShift}>
+    //   <Legend values={this.legendValues} width={scales.axisW-250} border="on"
+    //     fontColor={this.props.legendColor} fontFamily={this.props.legendFont}
+    //     display={this.props.legend} />
+    // </g>
 
-    let xLabels = this.getXLabels(scales.barWidth, scales.axisH)
-
-    let yLabels = this.getYLabels(scales.barScale, scales.step, scales.axisH)
-
-    let yTicks = this.getYTicks(scales.barScale, scales.step, scales.axisH)
-
-    let gridlines = this.getGridlines(scales.barScale, scales.step,
-      scales.axisW, scales.axisH)
-
-    let barsShift = "translate(" + ((scales.axisW - scales.barsW)/2) + ",0)"
-    let axisShift = "translate(" + (scales.graphW - scales.axisW) +
-      "," + 0 + ")"
-    let legendShift = "translate(" + (scales.graphW - scales.axisW + (this.props.width/7.5)) +
-      "," + (this.props.height - scales.legendH - 20) + ")"
+    let graph = (
+      <Axis key="axis" width={this.props.width} height={this.props.height}
+        graphTitle={this.props.graphTitle} xTitle={this.props.xTitle}
+        yTitle={this.props.yTitle} showXAxisLine={this.props.showXAxisLine}
+        showXLabels={this.props.showXLabels} showYAxisLine={this.props.showYAxisLine}
+        showYLabels={this.props.showYLabels} showGrid={this.props.showGrid}
+        axisStyle={this.props.axisStyle} minY={0} maxY={maxY + padY}
+        yScale={this.props.yScale} xAxisMode="discrete" labels={groups}
+        legendValues={this.props.groupKey ? this.getLegend() : null}
+        legendMode={this.props.legendMode} showLegend={this.props.showLegend}
+        legendStyle={this.props.legendStyle} >
+        <BarContainer data={this.props.data} groups={groups}
+          color={this.colorBar.bind(this)} max={maxY+padY}
+          yKey={this.props.yKey} yScale={this.props.yScale}
+          vertOffset={this.props.axisStyle.lineWidth/2}/>
+      </Axis>
+    )
 
     return (
-      <svg width={scales.graphW} height={this.props.height}>
-        <YTitle x="10" y={scales.axisH/2} title={this.props.yTitle}
-          color={this.props.yTitleColor} fontFamily={this.props.yTitleFont} />
-        <g transform={axisShift}>
-          <g>{gridlines}</g>
-          <g transform={barsShift}>{barRects}</g>
-          <g transform={barsShift}>{xLabels}</g>
-          <XTitle x={scales.axisW/2.12} y={scales.axisH+scales.xLabelH-30}
-            title={this.props.xTitle} color={this.props.xTitleColor}
-            fontFamily={this.props.xTitleFont} />
-          <g>{yTicks}</g>
-          <g>{yLabels}</g>
-          <XAxis width={scales.axisW} height={scales.axisH}
-            strokeWidth={this.props.xAxisStrokeW}
-            color={this.props.xAxisColor}
-            display={this.props.xAxis} />
-          <YAxis height={scales.axisH} display={this.props.yAxis}
-            strokeWidth={this.props.yAxisStrokeW}
-            color={this.props.yAxisColor} />
-        </g>
-        <g transform={legendShift}>
-          <Legend values={this.legendValues} width={scales.axisW-250} border="on"
-            fontColor={this.props.legendColor} fontFamily={this.props.legendFont}
-            display={this.props.legend} />
-        </g>
+      <svg width={this.props.width} height={this.props.height}>
+        {graph}
       </svg>
     )
   }
@@ -449,29 +492,45 @@ BarGraph.defaultProps = {
     "#4cab92", "#ca0004", "#8e44ad", "#eccc00",
     "#9dbd5f", "#0097bf", "#005c7a", "#fc6000"
   ],
-  xAxis: "inline",
-  xAxisStrokeW: 2,
-  xAxisColor: "#ffffff",
-  yAxis: "none",
+  showXAxisLine: true,
+  showXLabels: true,
+  showYAxisLine: true,
+  showYLabels: true,
+  showGrid: true,
+  showLegend: true,
   yScale: "lin",
-  yAxisStrokeW: 2,
-  yAxisColor: "#ffffff",
-  yTick: "none",
-  yTickStrokeW: 1,
-  yTickColor: "#ffffff",
-  yTickLength: 6,
-  gridline: "inline",
-  gridlineStrokeW: 1,
-  gridlineColor: "#ecf0f1",
-  gridlineOpacity: 0.6,
-  xTitleColor: "#ffffff",
-  xLabel: "inline",
-  xLabelColor: "#ffffff",
-  yTitleColor: "#ffffff",
-  yLabel: "inline",
-  yLabelColor: "#ffffff",
-  legend: "inline",
-  legendColor: "#ffffff",
+  legendMode: "flat",
+  axisStyle: {
+    axisColor: "#ffffff",
+    labelColor: "#ffffff",
+    titleColor: "#ffffff",
+    gridColor: "#DDDDDD",
+    lineWidth: 2,
+    lineOpacity: 1
+  },
+  // xAxis: "inline",
+  // xAxisStrokeW: 2,
+  // xAxisColor: "#ffffff",
+  // yAxis: "none",
+  // yScale: "lin",
+  // yAxisStrokeW: 2,
+  // yAxisColor: "#ffffff",
+  // yTick: "none",
+  // yTickStrokeW: 1,
+  // yTickColor: "#ffffff",
+  // yTickLength: 6,
+  // gridline: "inline",
+  // gridlineStrokeW: 1,
+  // gridlineColor: "#ecf0f1",
+  // gridlineOpacity: 0.6,
+  // xTitleColor: "#ffffff",
+  // xLabel: "inline",
+  // xLabelColor: "#ffffff",
+  // yTitleColor: "#ffffff",
+  // yLabel: "inline",
+  // yLabelColor: "#ffffff",
+  // legend: "inline",
+  // legendColor: "#ffffff",
 }
 
 BarGraph.propTypes = {
@@ -507,4 +566,4 @@ BarGraph.propTypes = {
   legendColor: PropTypes.string,
 }
 
-export default BarGraphResponsive
+export default BarGraph

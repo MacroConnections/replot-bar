@@ -156,12 +156,10 @@ class ExampleApp extends React.Component {
     super(props)
     this.state = {
       data: [
-        {weight: 1373, title: "China", color: "#4cab92"},
+        {weight: 1300, title: "China", color: "#4cab92"},
         {weight: 1266, title: "India", color: "#ca0004"},
         {weight: 323, title: "United States", color: "#003953"},
-        {weight: 258, title: "Indonesia", color: "#eccc00"},
         {weight: 205, title: "Brazil", color: "#9dbd5f"},
-        {weight: 201, title: "Pakistan", color: "#0097bf"},
         {weight: 186, title: "Nigeria", color: "#005c7a"},
         {weight: 156, title: "Bangladesh", color: "#fc6000"},
       ],
@@ -201,14 +199,14 @@ class ExampleApp extends React.Component {
     return(
       <div className="container">
         <h1 style={{textAlign: "center"}}> Bar Graph </h1>
+        <div style={{width:"70%", display:"inline-block"}}>
+          <BarGraph data={this.state.data} xKey="title" yKey="weight"
+            />
+        </div>
         <KeyValueTable data={this.state.data}
           updateData={this.updateData.bind(this)}
           addData={this.addData.bind(this)}
           updateScale={this.updateScale.bind(this)} />
-        <div style={{width:"70%", display:"inline-block"}}>
-          <BarGraph data={this.state.data} xKey="title" yKey="weight"
-            yScale={this.state.scale} xTitle="country" yTitle="population" />
-        </div>
       </div>
     )
   }

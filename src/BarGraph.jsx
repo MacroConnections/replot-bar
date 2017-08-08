@@ -9,7 +9,7 @@ class Bar extends React.Component {
   render() {
     return (
       <Motion
-        defaultStyle={{ height: 0 }}
+        defaultStyle={{ height: (this.props.initialAnimation ? 0 : this.props.height) }}
         style={{
           height: spring(this.props.height, {stiffness: 120, damping: 20})
         }}
@@ -36,24 +36,69 @@ class BarContainer extends React.Component {
     } else {
       unit = this.props.height / this.props.max
     }
-    let barX, barHeight
-    let barWidth = 50
+    let barX, barHeight, barWidth, dataPoint
 
-    let dataPoint
-    for (let i = 0; i < this.props.groups.length; i++) {
-      barX = (this.props.width/this.props.groups.length/2) + (i*this.props.width/this.props.groups.length)
-      dataPoint = this.props.data[i]
-      if (this.props.yScale === "log") {
-        barHeight = (Math.log10(this.props.max)-Math.log10(this.props.dataPoint[this.props.yKey])) * unit
-      } else {
-        barHeight = (dataPoint[this.props.yKey]) * unit
+
+    if (this.props.groupKey) {
+      let groups = [...new Set(this.props.data.map(item => item[this.props.groupKey]))]
+      let groupWidth = this.props.width/groups.length
+      let paddedWidth = groupWidth/1.5
+      barWidth = paddedWidth/this.props.xVals.length/1.2
+
+      let xCoords = {}
+      let x = ((groupWidth-paddedWidth)/2)
+      let xVal
+      for (let i = 0; i < this.props.xVals.length; i++) {
+        xVal = this.props.xVals[i]
+        xCoords[xVal] = x
+        xCoords[xVal + "index"] = i
+        x += paddedWidth/this.props.xVals.length
       }
-      series.push(
-        <Bar key={"bar" + i}
-          x={barX-(barWidth/2)} y={this.props.height-this.props.vertOffset}
-          width={barWidth} height={barHeight}
-          color={this.props.color(i, this.props.groups[i])}/>
-      )
+
+      for (let i = 0; i < groups.length; i++){
+        for (let j = 0; j < this.props.data.length; j++){
+          dataPoint = this.props.data[j]
+          if (!isNaN(dataPoint[this.props.yKey]) && dataPoint[this.props.groupKey] === groups[i]) {
+            barX = xCoords[dataPoint[this.props.xKey]]
+            if (this.props.yScale === "log") {
+              barHeight = Math.log10(dataPoint[this.props.yKey]) * unit
+            } else {
+              barHeight = dataPoint[this.props.yKey] * unit
+            }
+            series.push(
+              <Bar key={dataPoint[this.props.groupKey].concat(dataPoint[this.props.xKey])}
+                x={barX + barWidth/10} y={this.props.height-this.props.vertOffset}
+                width={barWidth <= 0 ? 0 : barWidth} height={barHeight}
+                color={this.props.color(xCoords[dataPoint[this.props.xKey] + "index"], dataPoint[this.props.xKey], groups[i])}
+                initialAnimation={this.props.initialAnimation}/>
+            )
+          }
+        }
+        for (let key in xCoords) {
+          if (!key.includes("index")){
+            xCoords[key] += this.props.width/groups.length
+          }
+        }
+      }
+
+    } else {
+      barWidth = this.props.width/this.props.data.length/2
+      for (let i = 0; i < this.props.data.length; i++) {
+        dataPoint = this.props.data[i]
+        barX = (this.props.width/this.props.data.length/2) + (i*this.props.width/this.props.data.length)
+        if (this.props.yScale === "log") {
+          barHeight = Math.log10(dataPoint[this.props.yKey]) * unit
+        } else {
+          barHeight = dataPoint[this.props.yKey] * unit
+        }
+        series.push(
+          <Bar key={dataPoint[this.props.xKey] + " Bar"}
+            x={barX-(barWidth/2)} y={this.props.height-this.props.vertOffset}
+            width={barWidth <= 0 ? 0 : barWidth} height={barHeight}
+            color={this.props.color(i, dataPoint[this.props.xKey])}
+            initialAnimation={this.props.initialAnimation}/>
+        )
+      }
     }
 
     return (
@@ -66,380 +111,36 @@ class BarContainer extends React.Component {
 
 
 class BarGraph extends React.Component {
-  // constructor(props) {
-  //   super(props)
-  //
-  //   this.groupMargin = 32 // margin width between groups
-  //   this.legendValues = {}
-  //   this.groupCounter = []
-  //   this.valueCounter = new Set()
-  //   this.palette = []
-  // }
-  //
-  // calculateScale() {
-  //   let yTitleW
-  //   if (this.props.yTitle) {
-  //     yTitleW = 20
-  //   } else {
-  //     yTitleW = 0
-  //   }
-  //   let minBarsW = Math.max((this.props.width - (60 + 50 + yTitleW)), (yTitleW + 10))
-  //   let barsW = Math.min(this.props.width, minBarsW)
-  //   let axisW = barsW + 50
-  //   let graphW = axisW + 60 + yTitleW
-  //
-  //   let xTitleH
-  //   if (this.props.xTitle) {
-  //     xTitleH = 20
-  //   } else {
-  //     xTitleH = 0
-  //   }
-  //   let legendH
-  //   if (this.props.groupKey) {
-  //     legendH = 50
-  //   } else {
-  //     legendH = 0
-  //   }
-  //   let xLabelH = 150
-  //   let axisH = this.props.height - (legendH + xLabelH + xTitleH)
-  //   if (axisH <= 0) {
-  //     axisH = 20
-  //   }
-  //
-  //   let maxY = 0
-  //   for (var i = 0; i < this.props.data.length; i++) {
-  //     let currY = this.props.data[i][this.props.yKey]
-  //     if (currY > maxY) {
-  //       maxY = currY
-  //     }
-  //   }
-  //
-  //   let barScale
-  //   let step
-  //   if (this.props.yScale === "lin") {
-  //     barScale = axisH / (maxY * 1.1)
-  //     let unit = 10 ** (Math.floor(Math.log10(maxY)))
-  //     let nearest = Math.ceil(maxY/unit)
-  //     step = (unit / 10) * nearest
-  //   } else {
-  //     barScale = axisH / (Math.log10(maxY) * 1.1)
-  //     let maxLog = Math.floor(Math.log10(maxY))
-  //     let unitLog = 10 ** (Math.floor(Math.log10(maxLog)))
-  //     let nearestLog = Math.ceil(maxLog/unitLog)
-  //     step = Math.max(1, (unitLog/10)*nearestLog)
-  //   }
-  //
-  //   let barWidth
-  //   if (this.props.groupKey) {
-  //     let numGroups = this.groupCounter.length
-  //     barWidth = (barsW-this.groupMargin*(numGroups+1))/this.props.data.length
-  //     if (barWidth <= 0) {
-  //       barWidth = 1
-  //     }
-  //   } else {
-  //     barWidth = barsW/this.props.data.length
-  //   }
-  //
-  //   return ({
-  //     graphW: graphW,
-  //     axisW: axisW,
-  //     barsW: barsW,
-  //     axisH: axisH,
-  //     barScale: barScale,
-  //     step: step,
-  //     barWidth: barWidth,
-  //     legendH: legendH,
-  //     xLabelH: xLabelH
-  //   })
-  // }
-  //
-  // getBars(barScale,barWidth,axisH) {
-  //   let bars = []
-  //   let padding = barWidth * 0.2
-  //   let width = barWidth - padding
-  //   let barX = -barWidth
-  //   let prevGroup = null
-  //
-  //   if (this.props.groupKey && typeof(this.props.color) !== "function") {
-  //     this.palette = getPalette(this.props.color,this.valueCounter.size)
-  //   }
-  //
-  //   for (let i = 0; i < this.props.data.length; i++) {
-  //     let d = this.props.data[i]
-  //     let xVal = d[this.props.xKey]
-  //     let yVal = d[this.props.yKey]
-  //     let group = d[this.props.groupKey]
-  //
-  //     if (this.props.groupKey && prevGroup !== group) {
-  //       barX += barWidth + this.groupMargin
-  //       prevGroup = group
-  //     } else {
-  //       barX += barWidth
-  //     }
-  //
-  //     let height
-  //     if (this.props.yScale === "log") {
-  //       height = Math.log10(yVal) * barScale
-  //     } else {
-  //       height = yVal * barScale // linear scale
-  //     }
-  //
-  //     let color = this.colorBar(xVal,yVal,group,i)
-  //
-  //     bars.push(
-  //       <Bar
-  //         key={barX} x={barX} axisHeight={axisH}
-  //         width={width} height={height} color={color} />
-  //     )
-  //   }
-  //   return bars
-  // }
-  //
-  // colorBar(x,y,group,i) {
-  //   if (typeof(this.props.color) === "function") {
-  //     let color = this.props.color(x,y,group,i)
-  //     if (group) {
-  //       this.legendValues[x] = color
-  //     }
-  //     return color
-  //   } else {
-  //     if (this.props.groupKey) {
-  //       if (this.legendValues[x]) {
-  //         return this.legendValues[x]
-  //       } else {
-  //         let color = this.palette.shift()
-  //         this.legendValues[x] = color
-  //         return color
-  //       }
-  //     } else {
-  //       return this.props.color[i%this.props.color.length]
-  //     }
-  //   }
-  // }
-  //
-  // getXLabels(barWidth,axisH) {
-  //   let xLabels = []
-  //   let xLabelY = axisH + 15
-  //
-  //   let longestLabel = 0 //length of the longest x label
-  //   for (let d of this.props.data) {
-  //     if (this.props.groupKey) {
-  //       longestLabel = Math.max(longestLabel,d[this.props.groupKey].length)
-  //     } else {
-  //       longestLabel = Math.max(longestLabel,d[this.props.xKey].length)
-  //     }
-  //   }
-  //
-  //   let tilt
-  //   if (this.props.xLabelTilt) {
-  //     tilt = this.props.xLabelTilt
-  //   } else {
-  //     let threshold = (this.groupCounter.length + 1) * barWidth * 0.1
-  //     if (longestLabel < threshold) {
-  //       tilt = 0
-  //     } else {
-  //       tilt = -65
-  //     }
-  //   }
-  //
-  //   if (this.props.groupKey) {
-  //     let startX = 0
-  //     let totalIndex = 0
-  //
-  //     for (let i = 0; i < this.groupCounter.length; i++) {
-  //       let endX = startX + (this.groupCounter[i] * barWidth)
-  //         + this.groupMargin /2
-  //       let xLabelX = (startX + endX) / 2 + this.groupMargin /2
-  //       let xValue = this.props.data[totalIndex][this.props.groupKey]
-  //       if (xValue === null) {
-  //         xValue = this.props.data[i][this.props.xKey]
-  //       }
-  //       startX = endX + this.groupMargin / 2
-  //       totalIndex += this.groupCounter[i]
-  //       xLabels.push(
-  //         <XLabel key={i} x={xLabelX} y={xLabelY} name={xValue}
-  //           color={this.props.xLabelColor} fontFamily={this.props.xLabelFont}
-  //           tilt={tilt} display={this.props.xLabel}/>
-  //       )
-  //     }
-  //   } else {
-  //     for (let i = 0; i < this.props.data.length; i++) {
-  //       let xLabelX = barWidth * (i + 0.4)
-  //       let xValue = this.props.data[i][this.props.xKey]
-  //       xLabels.push(
-  //         <XLabel key={i} x={xLabelX} y={xLabelY} name={xValue}
-  //           color={this.props.xLabelColor} fontFamily={this.props.xLabelFont}
-  //           tilt={tilt} display={this.props.xLabel}/>
-  //       )
-  //     }
-  //   }
-  //   return xLabels
-  // }
-  //
-  // getYLabels(barScale,step,axisH) {
-  //   let yLabels = []
-  //   let stepHeight = step * barScale
-  //   yLabels.push(
-  //     <YLabel key={axisH} y={axisH} value={0} color={this.props.yLabelColor}
-  //       fontFamily={this.props.yLabelFont} display={this.props.yLabel} />
-  //   )
-  //   for (var i = 1; i * stepHeight < axisH; i++) {
-  //     let yLabelY = axisH - (stepHeight * i)
-  //     let yLabelVal
-  //     if (this.props.yScale === "log") {
-  //       yLabelVal = 10 ** (step*i)
-  //     } else {
-  //       yLabelVal = Humanize.compactInteger(step*i,1) // linear scale
-  //     }
-  //     yLabels.push(
-  //       <YLabel key={yLabelY} y={yLabelY} value={yLabelVal}
-  //         color={this.props.yLabelColor}
-  //         fontFamily={this.props.yLabelFont}
-  //         display={this.props.yLabel} />
-  //     )
-  //   }
-  //   return yLabels
-  // }
-  //
-  // getYTicks(barScale,step,axisH) {
-  //   let yTicks = []
-  //   let stepHeight = step * barScale
-  //   for (var i = stepHeight; i < axisH; i = i + stepHeight) {
-  //     let yTickY = axisH - i
-  //     yTicks.push(
-  //       <YTick key={yTickY} y={yTickY} strokeWidth={this.props.yTickStrokeW}
-  //         length={this.props.yTickLength} color={this.props.yTickColor}
-  //         display={this.props.yTick} />
-  //     )
-  //   }
-  //   return yTicks
-  // }
-  //
-  // getGridlines(barScale,step,axisW,axisH) {
-  //   let gridlines = []
-  //   let stepHeight = step * barScale
-  //   for (var i = stepHeight; i < axisH; i = i + stepHeight) {
-  //     let gridY = axisH - i
-  //     gridlines.push(
-  //       <GridLine key={gridY} y={gridY} width={axisW}
-  //         strokeWidth={this.props.gridlineStrokeW}
-  //         color={this.props.gridlineColor}
-  //         opacity={this.props.gridlineOpacity}
-  //         display={this.props.gridline} />
-  //     )
-  //   }
-  //   return gridlines
-  // }
-  getLegend(){
-    let groups = [...new Set(this.props.data.map(item => item[this.props.xKey]))]
+
+  getLegend(vals){
     let legendValues = {}
-    for (let i = 0; i < groups.length; i++) {
-      legendValues[groups[i]] = this.colorBar(i, groups[i])
+    for (let i = 0; i < vals.length; i++) {
+      legendValues[vals[i]] = this.colorBar(i, vals[i])
     }
     return legendValues
   }
 
-  colorBar(i, group) {
+  colorBar(i, value, group) {
     if (this.props.color instanceof Array) {
       return this.props.color[i%this.props.color.length]
     } else {
-      return this.props.color(i, group)
+      return this.props.color(i, value, group)
     }
   }
 
   render() {
-    let groups
-    if (this.props.groupKey) {
-      groups = [...new Set(this.props.data.map(item => item[this.props.groupKey]))]
-    } else {
-      groups = [...new Set(this.props.data.map(item => item[this.props.xKey]))]
-    }
-
+    let xVals = [...new Set(this.props.data.map(item => item[this.props.xKey]))]
+    xVals = xVals.sort((a,b) => a-b)
     let yVals = this.props.data.map(item => item[this.props.yKey])
     let maxY = Math.max(...yVals)
     let padY = maxY / 5
 
-    // let groupKey = this.props.groupKey
-    // let xKey = this.props.xKey
-    //
-    // this.props.data.sort(function(a, b){
-    //   let aGroupKey = a[groupKey]
-    //   let bGroupKey = b[groupKey]
-    //   let aXKey = a[xKey]
-    //   let bXKey = b[xKey]
-    //   if (groupKey && aGroupKey < bGroupKey) {
-    //     return -1
-    //   } else if (groupKey && aGroupKey > bGroupKey) {
-    //     return 1
-    //   } else if (aXKey < bXKey) {
-    //     return -1
-    //   } else if (aXKey > bXKey) {
-    //     return 1
-    //   } else {
-    //     return 0
-    //   }
-    // })
-    //
-    // if (groupKey) {
-    //   let groupIndex = 0 // first group
-    //   this.groupCounter = [1] // first item in first group
-    //   this.valueCounter.add(this.props.data[0][xKey])
-    //   for (let i = 1; i < this.props.data.length; i++) {
-    //     if (this.props.data[i-1][groupKey] !== this.props.data[i][groupKey]) {
-    //       groupIndex += 1
-    //       this.groupCounter[groupIndex] = 1
-    //     } else {
-    //       this.groupCounter[groupIndex] += 1
-    //     }
-    //     this.valueCounter.add(this.props.data[i][xKey])
-    //   }
-    // }
-    //
-    // this.legendValues = {}
-    //
-    // let scales = this.calculateScale()
-    //
-    // let barRects = this.getBars(scales.barScale, scales.barWidth, scales.axisH)
-    //
-    // let xLabels = this.getXLabels(scales.barWidth, scales.axisH)
-    //
-    // let yLabels = this.getYLabels(scales.barScale, scales.step, scales.axisH)
-    //
-    // let yTicks = this.getYTicks(scales.barScale, scales.step, scales.axisH)
-    //
-    // let gridlines = this.getGridlines(scales.barScale, scales.step,
-    //   scales.axisW, scales.axisH)
-    //
-    // let barsShift = "translate(" + ((scales.axisW - scales.barsW)/2) + ",0)"
-    // let axisShift = "translate(" + (scales.graphW - scales.axisW) +
-    //   "," + 0 + ")"
-    // let legendShift = "translate(" + (scales.graphW - scales.axisW + (this.props.width/7.5)) +
-    //   "," + (this.props.height - scales.legendH - 20) + ")"
-
-    // <YTitle x="10" y={scales.axisH/2} title={this.props.yTitle}
-    //   color={this.props.yTitleColor} fontFamily={this.props.yTitleFont} />
-    // <g transform={axisShift}>
-    //   <g>{gridlines}</g>
-    //   <g transform={barsShift}>{barRects}</g>
-    //   <g transform={barsShift}>{xLabels}</g>
-    //   <XTitle x={scales.axisW/2.12} y={scales.axisH+scales.xLabelH-30}
-    //     title={this.props.xTitle} color={this.props.xTitleColor}
-    //     fontFamily={this.props.xTitleFont} />
-    //   <g>{yTicks}</g>
-    //   <g>{yLabels}</g>
-    //   <XAxis width={scales.axisW} height={scales.axisH}
-    //     strokeWidth={this.props.xAxisStrokeW}
-    //     color={this.props.xAxisColor}
-    //     display={this.props.xAxis} />
-    //   <YAxis height={scales.axisH} display={this.props.yAxis}
-    //     strokeWidth={this.props.yAxisStrokeW}
-    //     color={this.props.yAxisColor} />
-    // </g>
-    // <g transform={legendShift}>
-    //   <Legend values={this.legendValues} width={scales.axisW-250} border="on"
-    //     fontColor={this.props.legendColor} fontFamily={this.props.legendFont}
-    //     display={this.props.legend} />
-    // </g>
+    let xLabels
+    if (this.props.groupKey) {
+      xLabels = [...new Set(this.props.data.map(item => item[this.props.groupKey]))]
+    } else {
+      xLabels = xVals
+    }
 
     let graph = (
       <Axis key="axis" width={this.props.width} height={this.props.height}
@@ -448,14 +149,15 @@ class BarGraph extends React.Component {
         showXLabels={this.props.showXLabels} showYAxisLine={this.props.showYAxisLine}
         showYLabels={this.props.showYLabels} showGrid={this.props.showGrid}
         axisStyle={this.props.axisStyle} minY={0} maxY={maxY + padY}
-        yScale={this.props.yScale} xAxisMode="discrete" labels={groups}
-        legendValues={this.props.groupKey ? this.getLegend() : null}
+        yScale={this.props.yScale} xAxisMode="discrete" labels={xLabels}
+        legendValues={this.props.groupKey ? this.getLegend(xVals) : null}
         legendMode={this.props.legendMode} showLegend={this.props.showLegend}
         legendStyle={this.props.legendStyle} >
-        <BarContainer data={this.props.data} groups={groups}
-          color={this.colorBar.bind(this)} max={maxY+padY}
-          yKey={this.props.yKey} yScale={this.props.yScale}
-          vertOffset={this.props.axisStyle.lineWidth/2}/>
+        <BarContainer data={this.props.data} groupKey={this.props.groupKey}
+          color={this.colorBar.bind(this)} max={maxY+padY} xVals={xVals}
+          xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
+          vertOffset={this.props.axisStyle.lineWidth/2}
+          initialAnimation={this.props.initialAnimation}/>
       </Axis>
     )
 
@@ -467,21 +169,21 @@ class BarGraph extends React.Component {
   }
 }
 
-// class BarGraphResponsive extends React.Component {
-//
-//   render() {
-//
-//     return (
-//       <Resize width={this.props.width}>
-//         <BarGraph {...this.props} />
-//       </Resize>
-//     )
-//   }
-// }
-//
-// BarGraphResponsive.defaultProps = {
-//   width: 800
-// }
+class BarGraphResponsive extends React.Component {
+
+  render() {
+
+    return (
+      <Resize width={this.props.width}>
+        <BarGraph {...this.props} />
+      </Resize>
+    )
+  }
+}
+
+BarGraphResponsive.defaultProps = {
+  width: 800
+}
 
 BarGraph.defaultProps = {
   xKey: "x",
@@ -499,71 +201,46 @@ BarGraph.defaultProps = {
   showGrid: true,
   showLegend: true,
   yScale: "lin",
-  legendMode: "flat",
   axisStyle: {
-    axisColor: "#ffffff",
-    labelColor: "#ffffff",
-    titleColor: "#ffffff",
+    axisColor: "#000000",
+    labelColor: "#000000",
+    titleColor: "#000000",
     gridColor: "#DDDDDD",
     lineWidth: 2,
     lineOpacity: 1
   },
-  // xAxis: "inline",
-  // xAxisStrokeW: 2,
-  // xAxisColor: "#ffffff",
-  // yAxis: "none",
-  // yScale: "lin",
-  // yAxisStrokeW: 2,
-  // yAxisColor: "#ffffff",
-  // yTick: "none",
-  // yTickStrokeW: 1,
-  // yTickColor: "#ffffff",
-  // yTickLength: 6,
-  // gridline: "inline",
-  // gridlineStrokeW: 1,
-  // gridlineColor: "#ecf0f1",
-  // gridlineOpacity: 0.6,
-  // xTitleColor: "#ffffff",
-  // xLabel: "inline",
-  // xLabelColor: "#ffffff",
-  // yTitleColor: "#ffffff",
-  // yLabel: "inline",
-  // yLabelColor: "#ffffff",
-  // legend: "inline",
-  // legendColor: "#ffffff",
+  legendStyle: {
+    fontColor: "#000000",
+    backgroundColor: "none",
+    showBorder: false,
+    borderColor: "#000000"
+  },
+  initialAnimation: true
 }
 
 BarGraph.propTypes = {
   data: PropTypes.array.isRequired,
+  width: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string
+  ]),
+  height: PropTypes.number,
   xKey: PropTypes.string,
   yKey: PropTypes.string,
-  height: PropTypes.number,
-  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  color: PropTypes.array,
-  xAxis: PropTypes.string,
-  xAxisStrokeW: PropTypes.number,
-  xAxisColor: PropTypes.string,
-  yAxis: PropTypes.string,
+  color: PropTypes.oneOfType([
+    PropTypes.array,
+    PropTypes.func
+  ]),
+  showXAxisLine: PropTypes.bool,
+  showXLabels: PropTypes.bool,
+  showYAxisLine: PropTypes.bool,
+  showYLabels: PropTypes.bool,
+  showGrid: PropTypes.bool,
+  showLegend: PropTypes.bool,
   yScale: PropTypes.string,
-  yAxisStrokeW: PropTypes.number,
-  yAxisColor: PropTypes.string,
-  yTick: PropTypes.string,
-  yTickStrokeW: PropTypes.number,
-  yTickColor: PropTypes.string,
-  yTickLength: PropTypes.number,
-  gridline: PropTypes.string,
-  gridlineStrokeW: PropTypes.number,
-  gridlineColor: PropTypes.string,
-  gridlineOpacity: PropTypes.number,
-  xTitleColor: PropTypes.string,
-  xLabel: PropTypes.string,
-  xLabelColor: PropTypes.string,
-  xLabelTilt: PropTypes.number,
-  yTitleColor: PropTypes.string,
-  yLabel: PropTypes.string,
-  yLabelColor: PropTypes.string,
-  legend: PropTypes.string,
-  legendColor: PropTypes.string,
+  axisStyle: PropTypes.object,
+  legendStyle: PropTypes.object,
+  initialAnimation: PropTypes.bool
 }
 
-export default BarGraph
+export default BarGraphResponsive

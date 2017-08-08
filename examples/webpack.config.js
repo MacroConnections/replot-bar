@@ -1,12 +1,11 @@
 module.exports = function() {
   return {
     entry: {
-      grouped: "./example_grouped.jsx",
-      individual: "./example_individual.jsx"
+      example: "./example.jsx"
     },
     output: {
       path: __dirname + "/static",
-      filename: "[name].bundle.js"
+      filename: "bundle.js"
     },
     module: {
       loaders: [

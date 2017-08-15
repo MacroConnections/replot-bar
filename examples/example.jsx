@@ -249,7 +249,7 @@ class ExampleApp extends React.Component {
         <h1 style={{textAlign: "center"}}> Bar Graph </h1>
         <div style={{width:"70%", display:"inline-block"}}>
           <BarGraph data={this.state.data} xKey="title" yKey="weight"
-            yScale={this.state.scale}/>
+            yScale={this.state.scale} />
           <BarGraph data={this.state.groupedData} xKey="title" yKey="weight"
             groupKey="group" yScale={this.state.scale} />
         </div>

@@ -120,6 +120,50 @@ render() {
 }
 ```
 
+### Tooltip
+BarGraphs are capable of utilizing a tooltip to display more specific information
+about the data elements. By default, the tooltip is on, but can be deactivated by
+passing in a `tooltip` prop with a value of false. The tooltip features two different
+color schemes, dark and light, which can be specified by a
+`tooltipColor` prop, with a value of "dark" or "light".
+
+```javascript
+render() {
+  ...
+
+  return(
+    <BarGraph data={populations} tooltipColor="light" />
+  )
+}
+```
+
+#### Customizing Tooltip contents
+By default, the tooltip will display the x value, y value, and group (if it exists)
+for a bar. The user can customize exactly what is displayed inside the tooltip
+by passing in a `tooltipContents` prop in the form of a Javascript function.
+The user can expect to receive the raw Javascript object that corresponds to the
+bar you are hovering over. The function should return JSX, which can
+utilize some or all of the provided values.
+
+```javascript
+fillTooltip(data){
+  return (
+    <div>
+      <span>This bar is made with this data: {data}</span>
+    </div>
+  )
+}
+
+render() {
+  ...
+
+  return(
+    <BarGraph data={populations}
+      tooltipContents={this.fillTooltip}/>
+  )
+}
+```
+
 ### Axis Customization
 Replot BarGraphs allow for incredible customization of the graph axis. A complete
 explanation of axis customization can be found below -:

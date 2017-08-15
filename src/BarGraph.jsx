@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import {spring, Motion} from "react-motion"
-import {Axis, Resize} from "replot-core"
+import {Axis, Resize, Tooltip} from "replot-core"
 
 
 class Bar extends React.Component {
@@ -9,17 +9,23 @@ class Bar extends React.Component {
   render() {
     return (
       <Motion
-        defaultStyle={{ height: (this.props.initialAnimation ? 0 : this.props.height) }}
+        defaultStyle={{
+          y: (this.props.initialAnimation ? this.props.chartHeight : this.props.y),
+          height: (this.props.initialAnimation ? 0 : this.props.height)
+        }}
         style={{
-          height: spring(this.props.height, {stiffness: 120, damping: 20})
+          y: spring(this.props.y, {stiffness: 100, damping: 20}),
+          height: spring(this.props.height, {stiffness: 100, damping: 20})
         }}
       >
         {
           style =>
             <rect
-              x={this.props.x} y={this.props.y-style.height}
+              x={this.props.x} y={style.y}
               width={this.props.width} height={style.height}
-              fill={this.props.color} />
+              fill={this.props.color}
+              onMouseOver={this.props.activateTooltip.bind(this, this.props.raw)}
+              onMouseOut={this.props.deactivateTooltip}/>
         }
       </Motion>
     )
@@ -67,10 +73,14 @@ class BarContainer extends React.Component {
             }
             series.push(
               <Bar key={dataPoint[this.props.groupKey].concat(dataPoint[this.props.xKey])}
-                x={barX + barWidth/10} y={this.props.height-this.props.vertOffset}
-                width={barWidth <= 0 ? 0 : barWidth} height={barHeight}
+                x={barX + barWidth/10} y={this.props.height-barHeight}
+                width={barWidth <= 0 ? 0 : barWidth} height={barHeight-this.props.vertOffset}
+                chartHeight={this.props.height-this.props.vertOffset}
                 color={this.props.color(xCoords[dataPoint[this.props.xKey] + "index"], dataPoint[this.props.xKey], groups[i])}
-                initialAnimation={this.props.initialAnimation}/>
+                initialAnimation={this.props.initialAnimation}
+                raw={dataPoint}
+                activateTooltip={this.props.activateTooltip}
+                deactivateTooltip={this.props.deactivateTooltip}/>
             )
           }
         }
@@ -93,10 +103,14 @@ class BarContainer extends React.Component {
         }
         series.push(
           <Bar key={dataPoint[this.props.xKey] + " Bar"}
-            x={barX-(barWidth/2)} y={this.props.height-this.props.vertOffset}
-            width={barWidth <= 0 ? 0 : barWidth} height={barHeight}
+            x={barX-(barWidth/2)} y={this.props.height-barHeight}
+            width={barWidth <= 0 ? 0 : barWidth} height={barHeight-this.props.vertOffset}
+            chartHeight={this.props.height-this.props.vertOffset}
             color={this.props.color(i, dataPoint[this.props.xKey])}
-            initialAnimation={this.props.initialAnimation}/>
+            initialAnimation={this.props.initialAnimation}
+            raw={dataPoint}
+            activateTooltip={this.props.activateTooltip}
+            deactivateTooltip={this.props.deactivateTooltip}/>
         )
       }
     }
@@ -111,6 +125,51 @@ class BarContainer extends React.Component {
 
 
 class BarGraph extends React.Component {
+
+  constructor(){
+    super()
+    this.state = {
+      tooltipContents: null,
+      mouseOver: false,
+      mouseX: null,
+      mouseY: null
+    }
+  }
+
+  activateTooltip(data) {
+    let newContents
+    if (this.props.tooltipContents){
+      newContents = this.props.tooltipContents(data)
+    }
+    else {
+      newContents = (
+        <div>
+          <span>{this.props.xKey}: {data[this.props.xKey]}<br/></span>
+          <span>{this.props.yKey}: {data[this.props.yKey]}<br/></span>
+          {this.props.groupKey &&
+          <span>{this.props.groupKey}: {data[this.props.groupKey]}<br/></span>
+          }
+        </div>
+      )
+    }
+    this.setState({
+      tooltipContents: newContents,
+      mouseOver: true,
+    })
+  }
+
+  deactivateTooltip() {
+    this.setState({
+      mouseOver: false
+    })
+  }
+
+  updateMousePos(e) {
+    this.setState({
+      mouseX: e.pageX,
+      mouseY: e.pageY - 10
+    })
+  }
 
   getLegend(vals){
     let legendValues = {}
@@ -157,14 +216,26 @@ class BarGraph extends React.Component {
           color={this.colorBar.bind(this)} max={maxY+padY} xVals={xVals}
           xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
           vertOffset={this.props.axisStyle.lineWidth/2}
-          initialAnimation={this.props.initialAnimation}/>
+          initialAnimation={this.props.initialAnimation}
+          activateTooltip={this.activateTooltip.bind(this)}
+          deactivateTooltip={this.deactivateTooltip.bind(this)}/>
       </Axis>
     )
 
     return (
-      <svg width={this.props.width} height={this.props.height}>
-        {graph}
-      </svg>
+      <div onMouseMove={this.props.tooltip ? this.updateMousePos.bind(this) : null}>
+        {this.props.tooltip &&
+          <Tooltip
+            x={this.state.mouseX} y={this.state.mouseY}
+            active={this.state.mouseOver}
+            contents={this.state.tooltipContents}
+            colorScheme={this.props.tooltipColor}
+          />
+        }
+        <svg width={this.props.width} height={this.props.height}>
+          {graph}
+        </svg>
+      </div>
     )
   }
 }
@@ -215,7 +286,8 @@ BarGraph.defaultProps = {
     showBorder: false,
     borderColor: "#000000"
   },
-  initialAnimation: true
+  initialAnimation: true,
+  tooltip: true
 }
 
 BarGraph.propTypes = {
@@ -240,7 +312,10 @@ BarGraph.propTypes = {
   yScale: PropTypes.string,
   axisStyle: PropTypes.object,
   legendStyle: PropTypes.object,
-  initialAnimation: PropTypes.bool
+  initialAnimation: PropTypes.bool,
+  tooltip: PropTypes.bool,
+  tooltipColor: PropTypes.string,
+  tooltipContents: PropTypes.func
 }
 
 export default BarGraphResponsive

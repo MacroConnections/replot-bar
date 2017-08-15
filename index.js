@@ -863,16 +863,22 @@ var Bar = function (_React$Component) {
       return _react2.default.createElement(
         _reactMotion.Motion,
         {
-          defaultStyle: { height: this.props.initialAnimation ? 0 : this.props.height },
+          defaultStyle: {
+            y: this.props.initialAnimation ? this.props.chartHeight : this.props.y,
+            height: this.props.initialAnimation ? 0 : this.props.height
+          },
           style: {
-            height: (0, _reactMotion.spring)(this.props.height, { stiffness: 120, damping: 20 })
+            y: (0, _reactMotion.spring)(this.props.y, { stiffness: 100, damping: 20 }),
+            height: (0, _reactMotion.spring)(this.props.height, { stiffness: 100, damping: 20 })
           }
         },
         function (style) {
           return _react2.default.createElement("rect", {
-            x: _this2.props.x, y: _this2.props.y - style.height,
+            x: _this2.props.x, y: style.y,
             width: _this2.props.width, height: style.height,
-            fill: _this2.props.color });
+            fill: _this2.props.color,
+            onMouseOver: _this2.props.activateTooltip.bind(_this2, _this2.props.raw),
+            onMouseOut: _this2.props.deactivateTooltip });
         }
       );
     }
@@ -936,10 +942,14 @@ var BarContainer = function (_React$Component2) {
                 barHeight = dataPoint[this.props.yKey] * unit;
               }
               series.push(_react2.default.createElement(Bar, { key: dataPoint[this.props.groupKey].concat(dataPoint[this.props.xKey]),
-                x: barX + barWidth / 10, y: this.props.height - this.props.vertOffset,
-                width: barWidth <= 0 ? 0 : barWidth, height: barHeight,
+                x: barX + barWidth / 10, y: this.props.height - barHeight,
+                width: barWidth <= 0 ? 0 : barWidth, height: barHeight - this.props.vertOffset,
+                chartHeight: this.props.height - this.props.vertOffset,
                 color: this.props.color(xCoords[dataPoint[this.props.xKey] + "index"], dataPoint[this.props.xKey], groups[_i]),
-                initialAnimation: this.props.initialAnimation }));
+                initialAnimation: this.props.initialAnimation,
+                raw: dataPoint,
+                activateTooltip: this.props.activateTooltip,
+                deactivateTooltip: this.props.deactivateTooltip }));
             }
           }
           for (var key in xCoords) {
@@ -959,10 +969,14 @@ var BarContainer = function (_React$Component2) {
             barHeight = dataPoint[this.props.yKey] * unit;
           }
           series.push(_react2.default.createElement(Bar, { key: dataPoint[this.props.xKey] + " Bar",
-            x: barX - barWidth / 2, y: this.props.height - this.props.vertOffset,
-            width: barWidth <= 0 ? 0 : barWidth, height: barHeight,
+            x: barX - barWidth / 2, y: this.props.height - barHeight,
+            width: barWidth <= 0 ? 0 : barWidth, height: barHeight - this.props.vertOffset,
+            chartHeight: this.props.height - this.props.vertOffset,
             color: this.props.color(_i2, dataPoint[this.props.xKey]),
-            initialAnimation: this.props.initialAnimation }));
+            initialAnimation: this.props.initialAnimation,
+            raw: dataPoint,
+            activateTooltip: this.props.activateTooltip,
+            deactivateTooltip: this.props.deactivateTooltip }));
         }
       }
 
@@ -983,10 +997,74 @@ var BarGraph = function (_React$Component3) {
   function BarGraph() {
     _classCallCheck(this, BarGraph);
 
-    return _possibleConstructorReturn(this, (BarGraph.__proto__ || Object.getPrototypeOf(BarGraph)).apply(this, arguments));
+    var _this5 = _possibleConstructorReturn(this, (BarGraph.__proto__ || Object.getPrototypeOf(BarGraph)).call(this));
+
+    _this5.state = {
+      tooltipContents: null,
+      mouseOver: false,
+      mouseX: null,
+      mouseY: null
+    };
+    return _this5;
   }
 
   _createClass(BarGraph, [{
+    key: "activateTooltip",
+    value: function activateTooltip(data) {
+      var newContents = void 0;
+      if (this.props.tooltipContents) {
+        newContents = this.props.tooltipContents(data);
+      } else {
+        newContents = _react2.default.createElement(
+          "div",
+          null,
+          _react2.default.createElement(
+            "span",
+            null,
+            this.props.xKey,
+            ": ",
+            data[this.props.xKey],
+            _react2.default.createElement("br", null)
+          ),
+          _react2.default.createElement(
+            "span",
+            null,
+            this.props.yKey,
+            ": ",
+            data[this.props.yKey],
+            _react2.default.createElement("br", null)
+          ),
+          this.props.groupKey && _react2.default.createElement(
+            "span",
+            null,
+            this.props.groupKey,
+            ": ",
+            data[this.props.groupKey],
+            _react2.default.createElement("br", null)
+          )
+        );
+      }
+      this.setState({
+        tooltipContents: newContents,
+        mouseOver: true
+      });
+    }
+  }, {
+    key: "deactivateTooltip",
+    value: function deactivateTooltip() {
+      this.setState({
+        mouseOver: false
+      });
+    }
+  }, {
+    key: "updateMousePos",
+    value: function updateMousePos(e) {
+      this.setState({
+        mouseX: e.pageX,
+        mouseY: e.pageY - 10
+      });
+    }
+  }, {
     key: "getLegend",
     value: function getLegend(vals) {
       var legendValues = {};
@@ -1046,13 +1124,25 @@ var BarGraph = function (_React$Component3) {
           color: this.colorBar.bind(this), max: maxY + padY, xVals: xVals,
           xKey: this.props.xKey, yKey: this.props.yKey, yScale: this.props.yScale,
           vertOffset: this.props.axisStyle.lineWidth / 2,
-          initialAnimation: this.props.initialAnimation })
+          initialAnimation: this.props.initialAnimation,
+          activateTooltip: this.activateTooltip.bind(this),
+          deactivateTooltip: this.deactivateTooltip.bind(this) })
       );
 
       return _react2.default.createElement(
-        "svg",
-        { width: this.props.width, height: this.props.height },
-        graph
+        "div",
+        { onMouseMove: this.props.tooltip ? this.updateMousePos.bind(this) : null },
+        this.props.tooltip && _react2.default.createElement(_replotCore.Tooltip, {
+          x: this.state.mouseX, y: this.state.mouseY,
+          active: this.state.mouseOver,
+          contents: this.state.tooltipContents,
+          colorScheme: this.props.tooltipColor
+        }),
+        _react2.default.createElement(
+          "svg",
+          { width: this.props.width, height: this.props.height },
+          graph
+        )
       );
     }
   }]);
@@ -1115,7 +1205,8 @@ BarGraph.defaultProps = {
     showBorder: false,
     borderColor: "#000000"
   },
-  initialAnimation: true
+  initialAnimation: true,
+  tooltip: true
 };
 
 BarGraph.propTypes = {
@@ -1134,7 +1225,10 @@ BarGraph.propTypes = {
   yScale: _propTypes2.default.string,
   axisStyle: _propTypes2.default.object,
   legendStyle: _propTypes2.default.object,
-  initialAnimation: _propTypes2.default.bool
+  initialAnimation: _propTypes2.default.bool,
+  tooltip: _propTypes2.default.bool,
+  tooltipColor: _propTypes2.default.string,
+  tooltipContents: _propTypes2.default.func
 };
 
 exports.default = BarGraphResponsive;

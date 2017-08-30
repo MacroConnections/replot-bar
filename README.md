@@ -1,4 +1,4 @@
-# Scatter Plots for react
+# Bar chart for react
 Intelligent and customizable bar graph components for react.
 
 ## Installation

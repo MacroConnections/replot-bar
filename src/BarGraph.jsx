@@ -49,10 +49,13 @@ class BarContainer extends React.Component {
       let groups = [...new Set(this.props.data.map(item => item[this.props.groupKey]))]
       let groupWidth = this.props.width/groups.length
       let paddedWidth = groupWidth/1.5
-      barWidth = paddedWidth/this.props.xVals.length/1.2
+      barWidth = this.props.barWidth != null ? this.props.barWidth : paddedWidth/this.props.xVals.length/1.2
 
       let xCoords = {}
       let x = ((groupWidth-paddedWidth)/2)
+      if (this.props.barWidth != null) {
+        x += (paddedWidth - (barWidth * this.props.xVals.length))/(this.props.xVals.length + 1)/2
+      }
       let xVal
       for (let i = 0; i < this.props.xVals.length; i++) {
         xVal = this.props.xVals[i]
@@ -92,7 +95,7 @@ class BarContainer extends React.Component {
       }
 
     } else {
-      barWidth = this.props.width/this.props.data.length/2
+      barWidth = this.props.barWidth != null ? this.props.barWidth : this.props.width/this.props.data.length/2
       for (let i = 0; i < this.props.data.length; i++) {
         dataPoint = this.props.data[i]
         barX = (this.props.width/this.props.data.length/2) + (i*this.props.width/this.props.data.length)
@@ -214,7 +217,8 @@ class BarGraph extends React.Component {
         legendStyle={this.props.legendStyle} >
         <BarContainer data={this.props.data} groupKey={this.props.groupKey}
           color={this.colorBar.bind(this)} max={maxY+padY} xVals={xVals}
-          xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
+          xKey={this.props.xKey} yKey={this.props.yKey}
+          barWidth={this.props.barWidth} yScale={this.props.yScale}
           vertOffset={this.props.axisStyle.lineWidth/2}
           initialAnimation={this.props.initialAnimation}
           activateTooltip={this.activateTooltip.bind(this)}
@@ -309,6 +313,7 @@ BarGraph.propTypes = {
   showYLabels: PropTypes.bool,
   showGrid: PropTypes.bool,
   showLegend: PropTypes.bool,
+  barWidth: PropTypes.number,
   yScale: PropTypes.string,
   axisStyle: PropTypes.object,
   legendStyle: PropTypes.object,

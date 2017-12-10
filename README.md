@@ -88,7 +88,7 @@ render() {
 
 ### Dimensions
 Dimensions may be specified by passing in `width` and `height` props. The
-unit is pixels, and the LineChart defaults to 800 by 600 pixels.
+unit is pixels, and the BarGraph defaults to 800 by 600 pixels.
 
 Width dimensions may also be specified with a string, as a percentage. The width
 will then be calculated as a proportion of the parent container.
@@ -189,10 +189,10 @@ Title props accept strings to display in the appropriate location on the graph. 
 ```javascript
 render() {
   return(
-    <LineChart data={markets}
-      graphTitle="Annual Trends in Market Indices"
-      xTitle="Index Value"
-      yTitle="Year" />
+    <BarGraph data={populations}
+      graphTitle="Annual Population in the US and China"
+      xTitle="Year"
+      yTitle="Population" />
   )
 }
 ```
@@ -252,7 +252,7 @@ let style = {
 
 render() {
   return(
-    <LineChart data={markets} axisStyle={style} />
+    <BarGraph data={populations} axisStyle={style} />
   )
 }
 ```

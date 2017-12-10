@@ -20,14 +20,21 @@ The only *required* input is proper JSON formatted data.
 
 ### Basic Usage
 In the simplest case, just supply data (as a Javascript array) and specify the
-keys associated with the values -:
+keys associated with the values:
+
+![example](docs/img/bar-chart-example.png)
 
 ```javascript
 render() {
   let populations = [
-    {country: "China", population: 132275},
-    {country: "India", population: 134512},
-    {country: "USA", population: 326474},
+    {population: 1373, country: "China"},
+    {population: 1266, country: "India"},
+    {population: 323, country: "United States"},
+    {population: 958, country: "Indonesia"},
+    {population: 805, country: "Brazil"},
+    {population: 501, country: "Pakistan"},
+    {population: 786, country: "Nigeria"},
+    {population: 456, country: "Bangladesh"}
   ]
 
   return(
@@ -39,28 +46,39 @@ render() {
 ```
 
 - `data` is the only required prop
-- `xKey` defaults to `"x"`. X-value of bar graph is number or string.
-- `yKey` defaults to `"y"`. Y-value of bar graph is number.
+- `groupKey` defaults to `"group"`
+- `xKey` defaults to `"x"`
+- `yKey` defaults to `"y"`
 
 #### Grouped Bar Graph
 
 You can supply the data as array of JSON objects.
 
+![example](docs/img/grouped-bar-chart-example.png)
+
 ```javascript
 render() {
   let populations = [
-    {country: "China", year: 1980, count: 981200},
-    {country: "China", year: 1990, count: 113500},
-    {country: "China", year: 2000, count: 126300},
-    {country: "India", year: 1980, count: 699000},
-    {country: "India", year: 1990, count: 868900},
-    {country: "India", year: 2000, count: 104200}
+    {weight: 1379, country: "China", year: 2016},
+    {weight: 1371, country: "China", year: 2015},
+    {weight: 1364, country: "China", year: 2014},
+    {weight: 1357, country: "China", year: 2013},
+    {weight: 1351, country: "China", year: 2012},
+    {weight: 1344, country: "China", year: 2011},
+    {weight: 1338, country: "China", year: 2010},
+    {weight: 323, country: "United States", year: 2016},
+    {weight: 321, country: "United States", year: 2015},
+    {weight: 319, country: "United States", year: 2014},
+    {weight: 316, country: "United States", year: 2013},
+    {weight: 314, country: "United States", year: 2012},
+    {weight: 312, country: "United States", year: 2011},
+    {weight: 309, country: "United States", year: 2010}
   ]
 
 	return(
 		<BarGraph data={populations}
       xKey="year"
-      yKey="count"
+      yKey="weight"
 		  groupKey="country"/>
 	)
 }
@@ -70,10 +88,7 @@ render() {
 
 ### Dimensions
 Dimensions may be specified by passing in `width` and `height` props. The
-unit is pixels, and the Bar Graph defaults to 800 by 600 pixels.
-
-The Bar Graph will not function with a width that is less than 60 pixels, or with
-a height that is less than 100 pixels.
+unit is pixels, and the LineChart defaults to 800 by 600 pixels.
 
 Width dimensions may also be specified with a string, as a percentage. The width
 will then be calculated as a proportion of the parent container.
@@ -82,7 +97,7 @@ will then be calculated as a proportion of the parent container.
 render() {
 
 	return(
-		<BarGraph data={populations} width="50%" />
+		<BarGraph data={populations} width="50%" height="200px" />
 	)
 }
 ```
@@ -93,16 +108,23 @@ If none of the mechanisms are specified, BarGraph defaults to a built in
 color palette.
 
 #### User-provided Color Palette
-The user can specify their own desired colored palette for the bar graph to use.
-This is done by passing in an array of color strings to the component with the
-`color` prop. The displayed point series will cycle through the provided colors.
+Users can specify a list of colors to use as a palette, passed to the `color` prop.
+
+```javascript
+render() {
+  let colors = [
+    "#fea9ac", "#fc858f", "#f46b72", "#de836e",
+    "#caa56f", "#adcc6f", "#8ebc57", "#799b3f"
+  ]
+
+  return(
+    <BarGraph data={populations} color={colors} />
+  )
+}
+```
 
 #### User-provided Color function
-The user can specify the color for various bars by providing a function
-as well. One can expect to receive the index of the bar (first bar in the
-inputted data will have index 0, next group will have index 1, and so on),
-the x-value of the corresponding bar, as well as the group, if one exists.
-In the example below, color is decided based on the group:
+Users can also specify a function to assign colors to different bars. Expected arguments to the function are the index of the bar (from 0), its corresponding x-value, and its group (if it exists).
 
 ```javascript
 
@@ -121,32 +143,25 @@ render() {
 ```
 
 ### Tooltip
-BarGraphs are capable of utilizing a tooltip to display more specific information
-about the data elements. By default, the tooltip is on, but can be deactivated by
-passing in a `tooltip` prop with a value of false. The tooltip features two different
-color schemes, dark and light, which can be specified by a
-`tooltipColor` prop, with a value of "dark" or "light".
+Tooltips can display more specific information about a bar.
 
 ```javascript
 render() {
-  ...
-
   return(
-    <BarGraph data={populations} tooltipColor="light" />
+    <BarGraph data={populations} tooltip="true" tooltipColor="dark" />
   )
 }
 ```
 
-#### Customizing Tooltip contents
-By default, the tooltip will display the x value, y value, and group (if it exists)
-for a bar. The user can customize exactly what is displayed inside the tooltip
-by passing in a `tooltipContents` prop in the form of a Javascript function.
-The user can expect to receive the raw Javascript object that corresponds to the
-bar you are hovering over. The function should return JSX, which can
-utilize some or all of the provided values.
+- `tooltip` defaults to `true`, `false` turns the tooltip off
+- `tooltipColor` defaults to `light`, it can be set to `light` or `dark`
+- `tooltipContents` defaults to the x-value, y-value, and group for a bar
+
+#### User-provided Tooltip Function
+Users can customize what is displayed inside the tooltip with a function. Expected arguments to the function are the data for the specific point hovered over and an array of data for the line hovered over. The function should return JSX.
 
 ```javascript
-fillTooltip(data){
+fillTooltip(data) {
   return (
     <div>
       <span>This bar is made with this data: {data}</span>
@@ -155,57 +170,50 @@ fillTooltip(data){
 }
 
 render() {
-  ...
-
   return(
-    <BarGraph data={populations}
-      tooltipContents={this.fillTooltip}/>
+    <BarGraph data={populations} tooltipContents={this.fillTooltip} />
   )
 }
 ```
 
 ### Axis Customization
-Replot BarGraphs allow for incredible customization of the graph axis. A complete
-explanation of axis customization can be found below -:
-
-### Steps and Scales
-The axes default to linear scales, and intelligently determine the number of divisions
-to make along the y-axis. These can be changed by props passed in by the user.
-
-* `yScale`
-  * Determines the scaling used for the y-axis
-  * Defaults to `"lin"`
-  * Accepts `"lin"` or `"log"`
-* `ySteps`
-  * Determines the number of divisions in the y-axis
-  * Defaults to 1 division per 100 pixels
-  * Accepts any number
+Users can customize graph axes in several different ways.
 
 #### Titles
-By default, the BarGraph does not display any axis titles. If the user wishes to
-include titles, they can pass in some or all of the `xTitle`, `yTitle`, and
-`graphTitle` props. These props accept a string value, displayed at the appropriate
-location on the graph. To compensate for the inclusion of a title, the graph content
-will be pushed further in, but overall the size of the component will remain what
-was specified by the user.
+Title props accept strings to display in the appropriate location on the graph. To compensate for the inclusion of a title, graph content will be condensed, but the overall size of the component will stay constant.
 
-#### Showing/Hiding Axis Elements
-By default, the BarGraph shows the entirety of the axes, including lines, labels,
-and gridlines. These can each individually be disabled by passing in boolean
-values of false to the following props:
-- showXAxisLine
-- showYAxisLine
-- showXLabels
-- showYLabels
-- showGrid
-- showLegend
+- `graphTitle`: string displayed above the graph
+- `xTitle`: string displayed left of the x-axis
+- `yTitle`: string displayed under the y-axis
 
-#### Styling the axis
-In addition to enabling/disabling titles and axis components, the actual style of
-the components can be altered as well, with the use of one `axisStyle` prop that
-takes the form of a JavaScript object.
+```javascript
+render() {
+  return(
+    <LineChart data={markets}
+      graphTitle="Annual Trends in Market Indices"
+      xTitle="Index Value"
+      yTitle="Year" />
+  )
+}
+```
 
-Explanations and defaults follow:
+#### Displaying Axis Elements
+Users can customize the display of the lines, labels, and gridlines of the axes.
+
+- `showXAxisLine`: defaults to `true`, controls display of the x-axis line
+- `showYAxisLine`: defaults to `true`, controls display of the y-axis line
+- `showXLabels`: defaults to `true`, controls display of labels on the x-axis
+- `showYLabels`: defaults to `true`, controls display of labels on the y-axis
+- `showGrid`: defaults to `true`, controls display of gridlines
+
+#### Axis Scale
+Users can control the scale of the graph, linear or logarithmic. Users can also control the number of increments on the y-axis.
+
+- `yScale`: defaults to `"lin"` for linear scale, can be `"log"` for logarithmic scale
+- `ySteps`: defaults to 1 division per 100 pixels, accepts a number given by the user
+
+#### Axis Style
+Users can customize axis style by passing a javascript object to the `axisStyle` argument. Keys can include:
 
 * axisColor
   * modifies the color of the axis line
@@ -232,8 +240,6 @@ Explanations and defaults follow:
   * defaults to `1`
   * accepts any number
 
-Example of using the axisStyle prop:
-
 ```javascript
 let style = {
     axisColor: "#f17e33",
@@ -245,19 +251,20 @@ let style = {
   }
 
 render() {
-  ...
-
   return(
-    <BarGraph data={populations} axisStyle={style}/>
+    <LineChart data={markets} axisStyle={style} />
   )
 }
 ```
 
-#### Styling the legend
-The BarGraph will include a legend by default if a `groupKey` is included.
-If not disabled, the legend can be customized through a single `legendStyle` prop that takes the form of a JavaScript object.
+### Legend Customization
+Users can customize the graph legend in several ways.
 
-Explanations and defaults follow:
+- `showLegend`: defaults to `true` if there is a group key, controls display of the legend
+
+#### Legend Style
+Users can customize legend style by passing a javascript object to the `legendStyle` argument. Keys can include:
+
 * fontColor
 	* Modifies the color of the font used in the legend
 	* Defaults to `"#000000"`
@@ -275,7 +282,7 @@ Explanations and defaults follow:
 	* Defaults to `"#000000"`
 	* Accepts any color string
 
-### Initial Animation
-Initial animation is enabled by default, resulting in the bars growing out
-from the y-axis. This can be disabled using the
-`initialAnimation` prop, passing in a value of false.
+### Animation Customization
+Users can control the initial animation of the graph, bars growing out from the y-axis line.
+
+- `initialAnimation`: defaults to `true`, controls the animation

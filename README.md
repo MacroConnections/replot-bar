@@ -75,12 +75,12 @@ render() {
     {weight: 309, country: "United States", year: 2010}
   ]
 
-	return(
-		<BarGraph data={populations}
+  return(
+    <BarGraph data={populations}
       xKey="year"
       yKey="weight"
-		  groupKey="country"/>
-	)
+      groupKey="country"/>
+  )
 }
 ```
 
@@ -95,10 +95,9 @@ will then be calculated as a proportion of the parent container.
 
 ```javascript
 render() {
-
-	return(
-		<BarGraph data={populations} width="50%" height="200px" />
-	)
+  return(
+    <BarGraph data={populations} width="50%" height="200px" />
+  )
 }
 ```
 
@@ -135,10 +134,11 @@ colorMe(i, value, group) {
     return "blue"
   }
 }
+
 render() {
-	return(
-		<BarGraph data={populations} color={this.colorMe} />
-	)
+  return(
+    <BarGraph data={populations} color={this.colorMe} />
+  )
 }
 ```
 
@@ -242,13 +242,13 @@ Users can customize axis style by passing a javascript object to the `axisStyle`
 
 ```javascript
 let style = {
-    axisColor: "#f17e33",
-    labelColor: "blue",
-    titleColor: "#000000",
-    gridColor: "#DDDDDD",
-    lineWidth: 5,
-    lineOpacity: .5
-  }
+  axisColor: "#f17e33",
+  labelColor: "blue",
+  titleColor: "#000000",
+  gridColor: "#DDDDDD",
+  lineWidth: 5,
+  lineOpacity: .5
+}
 
 render() {
   return(

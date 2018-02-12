@@ -192,7 +192,7 @@ class BarGraph extends React.Component {
     xVals = xVals.sort((a,b) => a-b)
     let yVals = this.props.data.map(item => item[this.props.yKey])
     let maxY = Math.max(...yVals)
-    let padY = maxY / 5
+    let padY = maxY / 16
 
     let xLabels
     if (this.props.groupKey) {

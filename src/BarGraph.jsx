@@ -1,145 +1,14 @@
 import React from "react"
 import PropTypes from "prop-types"
-import {spring, Motion} from "react-motion"
 import {Axis} from "replot-core"
+import getColorFunc from "./getColorFunc.js"
+import getLegendValues from "./getLegendValues.js"
+import BarContainer from "./BarContainer.jsx"
 
+class BarGraph extends React.PureComponent {
 
-class Bar extends React.Component {
-
-  render() {
-    return (
-      <Motion
-        defaultStyle={{
-          y: (this.props.initialAnimation ? this.props.chartHeight : this.props.y),
-          height: (this.props.initialAnimation ? 0 : this.props.height)
-        }}
-        style={{
-          y: spring(this.props.y, {stiffness: 100, damping: 20}),
-          height: spring(this.props.height, {stiffness: 100, damping: 20})
-        }}
-      >
-        {
-          style =>
-            <rect
-              x={this.props.x} y={style.y}
-              width={this.props.width} height={style.height}
-              fill={this.props.color}
-              onMouseOver={this.props.activateTooltip.bind(this, this.props.raw)}
-              onMouseOut={this.props.deactivateTooltip}/>
-        }
-      </Motion>
-    )
-  }
-}
-
-class BarContainer extends React.Component {
-
-  render() {
-    let series = []
-    let unit
-    if (this.props.yScale === "log") {
-      unit = this.props.height / Math.log10(this.props.max)
-    } else {
-      unit = this.props.height / this.props.max
-    }
-    let barX, barHeight, barWidth, dataPoint
-
-
-    if (this.props.groupKey) {
-      let groups = [...new Set(this.props.data.map(item => item[this.props.groupKey]))]
-      let groupWidth = this.props.width/groups.length
-      let paddedWidth = groupWidth/1.5
-      barWidth = paddedWidth/this.props.xVals.length/1.2
-
-      let xCoords = {}
-      let x = ((groupWidth-paddedWidth)/2)
-      let xVal
-      for (let i = 0; i < this.props.xVals.length; i++) {
-        xVal = this.props.xVals[i]
-        xCoords[xVal] = x
-        xCoords[xVal + "index"] = i
-        x += paddedWidth/this.props.xVals.length
-      }
-
-      for (let i = 0; i < groups.length; i++){
-        for (let j = 0; j < this.props.data.length; j++){
-          dataPoint = this.props.data[j]
-          if (!isNaN(dataPoint[this.props.yKey]) && dataPoint[this.props.groupKey] === groups[i]) {
-            barX = xCoords[dataPoint[this.props.xKey]]
-            if (this.props.yScale === "log") {
-              barHeight = Math.log10(dataPoint[this.props.yKey]) * unit
-            } else {
-              barHeight = dataPoint[this.props.yKey] * unit
-            }
-            series.push(
-              <Bar key={dataPoint[this.props.groupKey].concat(dataPoint[this.props.xKey])}
-                x={barX + barWidth/10} y={this.props.height-barHeight}
-                width={barWidth <= 0 ? 0 : barWidth} height={barHeight-this.props.vertOffset}
-                chartHeight={this.props.height-this.props.vertOffset}
-                color={this.props.color(xCoords[dataPoint[this.props.xKey] + "index"], dataPoint[this.props.xKey], groups[i])}
-                initialAnimation={this.props.initialAnimation}
-                raw={dataPoint}
-                activateTooltip={this.props.activateTooltip}
-                deactivateTooltip={this.props.deactivateTooltip}/>
-            )
-          }
-        }
-        for (let key in xCoords) {
-          if (!key.includes("index")){
-            xCoords[key] += this.props.width/groups.length
-          }
-        }
-      }
-
-    } else {
-      barWidth = this.props.width/this.props.data.length/2
-      for (let i = 0; i < this.props.data.length; i++) {
-        dataPoint = this.props.data[i]
-        barX = (this.props.width/this.props.data.length/2) + (i*this.props.width/this.props.data.length)
-        if (this.props.yScale === "log") {
-          barHeight = Math.log10(dataPoint[this.props.yKey]) * unit
-        } else {
-          barHeight = dataPoint[this.props.yKey] * unit
-        }
-        series.push(
-          <Bar key={dataPoint[this.props.xKey] + " Bar"}
-            x={barX-(barWidth/2)} y={this.props.height-barHeight}
-            width={barWidth <= 0 ? 0 : barWidth} height={barHeight-this.props.vertOffset}
-            chartHeight={this.props.height-this.props.vertOffset}
-            color={this.props.color(i, dataPoint[this.props.xKey])}
-            initialAnimation={this.props.initialAnimation}
-            raw={dataPoint}
-            activateTooltip={this.props.activateTooltip}
-            deactivateTooltip={this.props.deactivateTooltip}/>
-        )
-      }
-    }
-
-    return (
-      <g>
-        {series}
-      </g>
-    )
-  }
-}
-
-
-class BarGraph extends React.Component {
-
-  getLegend(vals){
-    let legendValues = {}
-    for (let i = 0; i < vals.length; i++) {
-      legendValues[vals[i]] = this.colorBar(i, vals[i])
-    }
-    return legendValues
-  }
-
-  colorBar(i, value, group) {
-    if (this.props.color instanceof Array) {
-      return this.props.color[i%this.props.color.length]
-    } else {
-      return this.props.color(i, value, group)
-    }
+  constructor(props) {
+    super(props)
   }
 
   render() {
@@ -156,30 +25,29 @@ class BarGraph extends React.Component {
       xLabels = xVals
     }
 
-    let graph = (
-      <Axis key="axis" width={this.props.width} height={this.props.height}
-        graphTitle={this.props.graphTitle} xTitle={this.props.xTitle}
-        yTitle={this.props.yTitle} showXAxisLine={this.props.showXAxisLine}
-        showXLabels={this.props.showXLabels} showYAxisLine={this.props.showYAxisLine}
-        showYLabels={this.props.showYLabels} showGrid={this.props.showGrid}
-        axisStyle={this.props.axisStyle} minY={0} maxY={maxY + padY}
-        yScale={this.props.yScale} xAxisMode="discrete" labels={xLabels}
-        legendValues={this.props.groupKey ? this.getLegend(xVals) : null}
-        legendMode={this.props.legendMode} showLegend={this.props.showLegend}
-        legendStyle={this.props.legendStyle} >
-        <BarContainer data={this.props.data} groupKey={this.props.groupKey}
-          color={this.colorBar.bind(this)} max={maxY+padY} xVals={xVals}
-          xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
-          vertOffset={this.props.axisStyle.lineWidth/2}
-          initialAnimation={this.props.initialAnimation}
-          activateTooltip={this.props.activateTooltip}
-          deactivateTooltip={this.props.deactivateTooltip}/>
-      </Axis>
-    )
+    let colorFunc = getColorFunc(this.props.color)
+    let legendValues = this.props.groupKey ? getLegendValues(xVals, colorFunc) : null
 
     return (
       <svg width={this.props.width} height={this.props.height}>
-        {graph}
+        <Axis key="axis" width={this.props.width} height={this.props.height}
+          graphTitle={this.props.graphTitle} xTitle={this.props.xTitle}
+          yTitle={this.props.yTitle} showXAxisLine={this.props.showXAxisLine}
+          showXLabels={this.props.showXLabels} showYAxisLine={this.props.showYAxisLine}
+          showYLabels={this.props.showYLabels} showGrid={this.props.showGrid}
+          axisStyle={this.props.axisStyle} minY={0} maxY={maxY + padY}
+          yScale={this.props.yScale} xAxisMode="discrete" labels={xLabels}
+          legendValues={legendValues}
+          legendMode={this.props.legendMode} showLegend={this.props.showLegend}
+          legendStyle={this.props.legendStyle} >
+          <BarContainer data={this.props.data} groupKey={this.props.groupKey}
+            color={colorFunc} max={maxY+padY} xVals={xVals}
+            xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
+            vertOffset={this.props.axisStyle.lineWidth/2}
+            initialAnimation={this.props.initialAnimation}
+            activateTooltip={this.props.activateTooltip}
+            deactivateTooltip={this.props.deactivateTooltip}/>
+        </Axis>
       </svg>
     )
   }

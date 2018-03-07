@@ -29,6 +29,29 @@ class BarGraph extends React.PureComponent {
 
     let colorFunc = getColorFunc(this.props.color)
     let legendValues = this.props.groupKey ? getLegendValues(xVals, colorFunc) : null
+    let axisStyle = {
+      titleColor: this.props.graphTitleColor,
+      titleFontSize: this.props.titleFontSize,
+      titleFontFamily: this.props.titleFontFamily,
+      labelColor: this.props.labelColor,
+      labelFontSize: this.props.labelFontSize,
+      labelFontFamily: this.props.labelFontFamily,
+      axisColor: this.props.axisColor,
+      lineWidth: this.props.axisWidth,
+      lineOpacity: this.props.axisOpacity,
+      gridColor: this.props.gridColor,
+      gridWidth: this.props.gridWidth,
+      gridOpacity: this.props.gridOpacity,
+      tickColor: this.props.tickColor,
+      tickWidth: this.props.tickWidth,
+      tickOpacity: this.props.tickOpacity,
+    }
+    let legendStyle = {
+      fontColor: this.props.legendFontColor,
+      backgroundColor: this.props.legendBackground,
+      showBorder: this.props.legendShowBorder,
+      borderColor: this.props.legendBorderColor,
+    }
 
     return (
       <svg width={this.props.width} height={this.props.height}>
@@ -37,15 +60,15 @@ class BarGraph extends React.PureComponent {
           yTitle={this.props.yTitle} showXAxisLine={this.props.showXAxisLine}
           showXLabels={this.props.showXLabels} showYAxisLine={this.props.showYAxisLine}
           showYLabels={this.props.showYLabels} showGrid={this.props.showGrid}
-          axisStyle={this.props.axisStyle} minY={0} maxY={maxY + padY}
+          axisStyle={axisStyle} minY={0} maxY={maxY + padY}
           yScale={this.props.yScale} xAxisMode="discrete" labels={xLabels}
           legendValues={legendValues}
           legendMode={this.props.legendMode} showLegend={this.props.showLegend}
-          legendStyle={this.props.legendStyle} >
+          legendStyle={legendStyle} >
           <BarContainer data={this.props.data} groupKey={this.props.groupKey}
             color={colorFunc} max={maxY+padY} xVals={xVals}
             xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
-            vertOffset={this.props.axisStyle.lineWidth/2}
+            vertOffset={this.props.axisWidth/2}
             initialAnimation={this.props.initialAnimation}
             activateTooltip={this.props.activateTooltip}
             deactivateTooltip={this.props.deactivateTooltip}/>
@@ -64,27 +87,34 @@ BarGraph.defaultProps = {
     "#4cab92", "#ca0004", "#8e44ad", "#eccc00",
     "#9dbd5f", "#0097bf", "#005c7a", "#fc6000"
   ],
-  showXAxisLine: true,
-  showXLabels: true,
-  showYAxisLine: true,
-  showYLabels: true,
-  showGrid: true,
-  showLegend: true,
   yScale: "lin",
-  axisStyle: {
-    axisColor: "#000000",
-    labelColor: "#000000",
-    titleColor: "#000000",
-    gridColor: "#DDDDDD",
-    lineWidth: 2,
-    lineOpacity: 1
-  },
-  legendStyle: {
-    fontColor: "#000000",
-    backgroundColor: "none",
-    showBorder: false,
-    borderColor: "#000000"
-  },
+
+  showXAxisLine: true,
+  showYAxisLine: true,
+  axisColor: "#AAA",
+  axisWidth: 2,
+  axisOpacity: 1,
+
+  showGrid: true,
+  gridColor: "#AAA",
+  gridWidth: 2,
+  gridOpacity: 1,
+
+  tickColor: "#AAA",
+  tickWidth: 2,
+  tickOpacity: 1,
+
+  showXLabels: true,
+  showYLabels: true,
+  labelColor: "#AAA",
+  graphTitleColor: "#AAA",
+
+  showLegend: true,
+  legendFontColor: "#AAA",
+  legendBackground: "none",
+  legendShowBorder: false,
+  legendBorderColor: "#AAA",
+
   initialAnimation: true,
 }
 
@@ -101,15 +131,39 @@ BarGraph.propTypes = {
     PropTypes.array,
     PropTypes.func
   ]),
-  showXAxisLine: PropTypes.bool,
-  showXLabels: PropTypes.bool,
-  showYAxisLine: PropTypes.bool,
-  showYLabels: PropTypes.bool,
-  showGrid: PropTypes.bool,
-  showLegend: PropTypes.bool,
   yScale: PropTypes.string,
-  axisStyle: PropTypes.object,
-  legendStyle: PropTypes.object,
+
+  showXAxisLine: PropTypes.bool,
+  showYAxisLine: PropTypes.bool,
+  axisColor: PropTypes.string,
+  axisWidth: PropTypes.number,
+  axisOpacity: PropTypes.number,
+
+  showGrid: PropTypes.bool,
+  gridColor: PropTypes.string,
+  gridWidth: PropTypes.number,
+  gridOpacity: PropTypes.number,
+
+  tickColor: PropTypes.string,
+  tickWidth: PropTypes.number,
+  tickOpacity: PropTypes.number,
+
+  showXLabels: PropTypes.bool,
+  showYLabels: PropTypes.bool,
+  labelColor: PropTypes.string,
+  labelFontSize: PropTypes.number,
+  labelFontFamily: PropTypes.number,
+
+  graphTitleColor: PropTypes.string,
+  graphTitleFontSize: PropTypes.number,
+  graphTitleFontFamily: PropTypes.number,
+
+  showLegend: PropTypes.bool,
+  legendFontColor: PropTypes.string,
+  legendBackground: PropTypes.string,
+  legendShowBorder: PropTypes.bool,
+  legendBorderColor: PropTypes.string,
+
   initialAnimation: PropTypes.bool,
 }
 

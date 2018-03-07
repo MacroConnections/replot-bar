@@ -44,6 +44,19 @@ class BarContainer extends React.Component {
             } else {
               barHeight = dataPoint[this.props.yKey] * unit
             }
+            let errX = barX + barWidth/10 + (barWidth <= 0 ? 0 : barWidth/2)
+            let errMinY = null
+            let errMaxY = null
+            if (this.props.errorBarMinKey && dataPoint[this.props.errorBarMinKey]) {
+              let errMin = dataPoint[this.props.errorBarMinKey]
+              let errMinHeight = (this.props.yScale === "log") ? Math.log10(errMin) * unit : errMin * unit
+              errMinY = this.props.height - errMinHeight
+            }
+            if (this.props.errorBarMaxKey && dataPoint[this.props.errorBarMaxKey]) {
+              let errMax = dataPoint[this.props.errorBarMaxKey]
+              let errMaxHeight = (this.props.yScale === "log") ? Math.log10(errMax) * unit : errMax * unit
+              errMaxY = this.props.height - errMaxHeight
+            }
             series.push(
               <Bar key={`${dataPoint[this.props.groupKey]}-${dataPoint[this.props.xKey]}`}
                 x={barX + barWidth/10} y={this.props.height-barHeight}
@@ -51,6 +64,8 @@ class BarContainer extends React.Component {
                 chartHeight={this.props.height-this.props.vertOffset}
                 color={this.props.color(xCoords[dataPoint[this.props.xKey] + "index"], dataPoint[this.props.xKey], groups[i])}
                 initialAnimation={this.props.initialAnimation}
+                errorX={errX} errorMinY={errMinY} errorMaxY={errMaxY}
+                errorColor={this.props.errorBarColor}
                 raw={dataPoint}
                 activateTooltip={this.props.activateTooltip}
                 deactivateTooltip={this.props.deactivateTooltip}/>
@@ -74,6 +89,18 @@ class BarContainer extends React.Component {
         } else {
           barHeight = dataPoint[this.props.yKey] * unit
         }
+        let errMinY = null
+        let errMaxY = null
+        if (this.props.errorBarMinKey && dataPoint[this.props.errorBarMinKey]) {
+          let errMin = dataPoint[this.props.errorBarMinKey]
+          let errMinHeight = (this.props.yScale === "log") ? Math.log10(errMin) * unit : errMin * unit
+          errMinY = this.props.height - errMinHeight
+        }
+        if (this.props.errorBarMaxKey && dataPoint[this.props.errorBarMaxKey]) {
+          let errMax = dataPoint[this.props.errorBarMaxKey]
+          let errMaxHeight = (this.props.yScale === "log") ? Math.log10(errMax) * unit : errMax * unit
+          errMaxY = this.props.height - errMaxHeight
+        }
         series.push(
           <Bar key={dataPoint[this.props.xKey] + " Bar"}
             x={barX-(barWidth/2)} y={this.props.height-barHeight}
@@ -81,6 +108,8 @@ class BarContainer extends React.Component {
             chartHeight={this.props.height-this.props.vertOffset}
             color={this.props.color(i, dataPoint[this.props.xKey])}
             initialAnimation={this.props.initialAnimation}
+            errorX={barX} errorMinY={errMinY} errorMaxY={errMaxY}
+            errorColor={this.props.errorBarColor}
             raw={dataPoint}
             activateTooltip={this.props.activateTooltip}
             deactivateTooltip={this.props.deactivateTooltip}/>

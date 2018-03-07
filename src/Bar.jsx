@@ -8,6 +8,21 @@ class Bar extends React.PureComponent {
   }
 
   render() {
+    let errorBar = null
+    if (this.props.errorMinY && this.props.errorMaxY) {
+      errorBar = <g>
+          <line x1={this.props.errorX-5} y1={this.props.errorMinY}
+            x2={this.props.errorX+5} y2={this.props.errorMinY}
+            strokeWidth={2} stroke={this.props.errorColor}/>
+          <line x1={this.props.errorX} y1={this.props.errorMinY}
+            x2={this.props.errorX} y2={this.props.errorMaxY}
+            strokeWidth={2} stroke={this.props.errorColor}/>
+          <line x1={this.props.errorX-5} y1={this.props.errorMaxY}
+            x2={this.props.errorX+5} y2={this.props.errorMaxY}
+            strokeWidth={2} stroke={this.props.errorColor}/>
+        </g>
+    }
+
     return (
       <Motion
         defaultStyle={{
@@ -21,12 +36,15 @@ class Bar extends React.PureComponent {
       >
         {
           style =>
-            <rect
-              x={this.props.x} y={style.y}
-              width={this.props.width} height={style.height}
-              fill={this.props.color}
-              onMouseOver={this.props.activateTooltip.bind(this, this.props.raw)}
-              onMouseOut={this.props.deactivateTooltip}/>
+            <g>
+              <rect
+                x={this.props.x} y={style.y}
+                width={this.props.width} height={style.height}
+                fill={this.props.color}
+                onMouseOver={this.props.activateTooltip.bind(this, this.props.raw)}
+                onMouseOut={this.props.deactivateTooltip}/>
+              {errorBar}
+            </g>
         }
       </Motion>
     )

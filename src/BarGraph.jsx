@@ -14,6 +14,10 @@ class BarGraph extends React.PureComponent {
   render() {
     let yVals = this.props.data.map(item => item[this.props.yKey])
     let maxY = Math.max(...yVals)
+    if (this.props.errorBarMinKey && this.props.errorBarMaxKey) {
+      let yMaxErrors = this.props.data.map(item => item[this.props.errorBarMaxKey] ? item[this.props.errorBarMaxKey] : 0)
+      maxY = Math.max(maxY, Math.max(...yMaxErrors))
+    }
     let padY = maxY / 16
 
     let xVals
@@ -68,6 +72,8 @@ class BarGraph extends React.PureComponent {
           <BarContainer data={this.props.data} groupKey={this.props.groupKey}
             color={colorFunc} max={maxY+padY} xVals={xVals}
             xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
+            errorBarMinKey={this.props.errorBarMinKey} errorBarMaxKey={this.props.errorBarMaxKey}
+            errorBarColor={this.props.errorBarColor}
             vertOffset={this.props.axisWidth/2}
             initialAnimation={this.props.initialAnimation}
             activateTooltip={this.props.activateTooltip}
@@ -76,6 +82,27 @@ class BarGraph extends React.PureComponent {
       </svg>
     )
   }
+}
+
+function validateErrorMin(props, propName, componentName) {
+  componentName = componentName || 'ANONYMOUS'
+  if (!props.errorBarMinKey) {
+    return null
+  }
+  if (typeof props.errorBarMinKey !== 'string') {
+    return new Error("errorBarMinKey must be a string.")
+  }
+  for (let item of props.data) {
+    if (item[props.errorBarMinKey] && item[props.errorBarMaxKey]) {
+      if (item[props.errorBarMinKey] > item[props.yKey]) {
+        return new Error("Min error cannot be larger than the weight.")
+      }
+      if (item[props.yKey] > item[props.errorBarMaxKey]) {
+        return new Error("Max error cannot be smaller than the weight.")
+      }
+    }
+  }
+  return null
 }
 
 BarGraph.defaultProps = {
@@ -88,6 +115,7 @@ BarGraph.defaultProps = {
     "#9dbd5f", "#0097bf", "#005c7a", "#fc6000"
   ],
   yScale: "lin",
+  errorBarColor: "#AAA",
 
   showXAxisLine: true,
   showYAxisLine: true,
@@ -132,6 +160,9 @@ BarGraph.propTypes = {
     PropTypes.func
   ]),
   yScale: PropTypes.string,
+  errorBarMinKey: validateErrorMin,
+  errorBarMaxKey: PropTypes.string,
+  errorBarColor: PropTypes.string,
 
   showXAxisLine: PropTypes.bool,
   showYAxisLine: PropTypes.bool,

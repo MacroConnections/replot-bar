@@ -1,5 +1,5 @@
 import React from "react"
-import BarChart from "../../src/BarGraph.jsx"
+import BarChart from "../../index.js"
 import ComponentContainer from "./CompContainer/ComponentContainer.jsx"
 import colors from "../colors"
 

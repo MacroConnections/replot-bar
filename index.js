@@ -1,3 +1,3 @@
-import BarGraph from "./src/index.jsx"
+import BarGraph from "./src/BarGraphTooltip.jsx"
 
 export default BarGraph

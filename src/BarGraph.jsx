@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import {spring, Motion} from "react-motion"
-import {Axis, Resize, Tooltip} from "replot-core"
+import {Axis} from "replot-core"
 
 
 class Bar extends React.Component {
@@ -126,51 +126,6 @@ class BarContainer extends React.Component {
 
 class BarGraph extends React.Component {
 
-  constructor(){
-    super()
-    this.state = {
-      tooltipContents: null,
-      mouseOver: false,
-      mouseX: null,
-      mouseY: null
-    }
-  }
-
-  activateTooltip(data) {
-    let newContents
-    if (this.props.tooltipContents){
-      newContents = this.props.tooltipContents(data)
-    }
-    else {
-      newContents = (
-        <div>
-          <span>{this.props.xKey}: {data[this.props.xKey]}<br/></span>
-          <span>{this.props.yKey}: {data[this.props.yKey]}<br/></span>
-          {this.props.groupKey &&
-          <span>{this.props.groupKey}: {data[this.props.groupKey]}<br/></span>
-          }
-        </div>
-      )
-    }
-    this.setState({
-      tooltipContents: newContents,
-      mouseOver: true,
-    })
-  }
-
-  deactivateTooltip() {
-    this.setState({
-      mouseOver: false
-    })
-  }
-
-  updateMousePos(e) {
-    this.setState({
-      mouseX: e.pageX,
-      mouseY: e.pageY - 10
-    })
-  }
-
   getLegend(vals){
     let legendValues = {}
     for (let i = 0; i < vals.length; i++) {
@@ -217,43 +172,17 @@ class BarGraph extends React.Component {
           xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
           vertOffset={this.props.axisStyle.lineWidth/2}
           initialAnimation={this.props.initialAnimation}
-          activateTooltip={this.activateTooltip.bind(this)}
-          deactivateTooltip={this.deactivateTooltip.bind(this)}/>
+          activateTooltip={this.props.activateTooltip}
+          deactivateTooltip={this.props.deactivateTooltip}/>
       </Axis>
     )
 
     return (
-      <div onMouseMove={this.props.tooltip ? this.updateMousePos.bind(this) : null}>
-        {this.props.tooltip &&
-          <Tooltip
-            x={this.state.mouseX} y={this.state.mouseY}
-            active={this.state.mouseOver}
-            contents={this.state.tooltipContents}
-            colorScheme={this.props.tooltipColor}
-          />
-        }
-        <svg width={this.props.width} height={this.props.height}>
-          {graph}
-        </svg>
-      </div>
+      <svg width={this.props.width} height={this.props.height}>
+        {graph}
+      </svg>
     )
   }
-}
-
-class BarGraphResponsive extends React.Component {
-
-  render() {
-
-    return (
-      <Resize width={this.props.width}>
-        <BarGraph {...this.props} />
-      </Resize>
-    )
-  }
-}
-
-BarGraphResponsive.defaultProps = {
-  width: 800
 }
 
 BarGraph.defaultProps = {
@@ -287,7 +216,6 @@ BarGraph.defaultProps = {
     borderColor: "#000000"
   },
   initialAnimation: true,
-  tooltip: true
 }
 
 BarGraph.propTypes = {
@@ -313,9 +241,6 @@ BarGraph.propTypes = {
   axisStyle: PropTypes.object,
   legendStyle: PropTypes.object,
   initialAnimation: PropTypes.bool,
-  tooltip: PropTypes.bool,
-  tooltipColor: PropTypes.string,
-  tooltipContents: PropTypes.func
 }
 
-export default BarGraphResponsive
+export default BarGraph

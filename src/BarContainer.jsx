@@ -45,7 +45,7 @@ class BarContainer extends React.Component {
               barHeight = dataPoint[this.props.yKey] * unit
             }
             series.push(
-              <Bar key={dataPoint[this.props.groupKey].concat(dataPoint[this.props.xKey])}
+              <Bar key={`${dataPoint[this.props.groupKey]}-${dataPoint[this.props.xKey]}`}
                 x={barX + barWidth/10} y={this.props.height-barHeight}
                 width={barWidth <= 0 ? 0 : barWidth} height={barHeight-this.props.vertOffset}
                 chartHeight={this.props.height-this.props.vertOffset}

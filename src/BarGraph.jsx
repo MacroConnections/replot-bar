@@ -12,16 +12,18 @@ class BarGraph extends React.PureComponent {
   }
 
   render() {
-    let xVals = [...new Set(this.props.data.map(item => item[this.props.xKey]))]
-    xVals = xVals.sort((a,b) => a-b)
     let yVals = this.props.data.map(item => item[this.props.yKey])
     let maxY = Math.max(...yVals)
     let padY = maxY / 16
 
+    let xVals
     let xLabels
     if (this.props.groupKey) {
+      xVals = [...new Set(this.props.data.map(item => item[this.props.xKey]))]
       xLabels = [...new Set(this.props.data.map(item => item[this.props.groupKey]))]
+      xVals.sort()
     } else {
+      xVals = this.props.data.map(item => item[this.props.xKey])
       xLabels = xVals
     }
 

@@ -119,30 +119,12 @@ BarGraph.defaultProps = {
 
   showXAxisLine: true,
   showYAxisLine: true,
-  axisColor: "#AAA",
-  axisWidth: 2,
-  axisOpacity: 1,
-
   showGrid: true,
-  gridColor: "#AAA",
-  gridWidth: 2,
-  gridOpacity: 1,
-
-  tickColor: "#AAA",
-  tickWidth: 2,
-  tickOpacity: 1,
-
   showXLabels: true,
   showYLabels: true,
-  labelColor: "#AAA",
-  graphTitleColor: "#AAA",
-
   showLegend: true,
-  legendFontColor: "#AAA",
   legendBackground: "none",
   legendShowBorder: false,
-  legendBorderColor: "#AAA",
-
   initialAnimation: true,
 }
 

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom"
 import Radium from "radium"
 import SectionContainer from "./components/SectionContainer.jsx"
 import BarExample from "./components/BarExample.jsx"
+import ErrorBarExample from "./components/ErrorBarExample.jsx"
 import GroupedBarExample from "./components/GroupedBarExample.jsx"
 
 class ExamplesSection extends React.Component {
@@ -10,6 +11,7 @@ class ExamplesSection extends React.Component {
     return(
       <SectionContainer>
         <BarExample palette={this.props.palette} />
+        <ErrorBarExample palette={this.props.palette} />
         <GroupedBarExample palette={this.props.palette} />
       </SectionContainer>
     )

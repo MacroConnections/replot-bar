@@ -28,7 +28,6 @@ class ErrorBarExample extends React.Component {
         {optionName: "axisColor", name: "Axis Color", optionType: "field", initialValue: colors[this.props.palette].axisColor},
         {optionName: "axisWidth", name: "Axis Line Width", optionType: "field", input: "number", initialValue: 1.5},
         {optionName: "axisOpacity", name: "Axis Line Opacity", optionType: "field", input: "number", initialValue: 1},
-        {optionName: "gridColor", name: "Grid Line Color", optionType: "field", initialValue: colors[this.props.palette].axisColor},
         {optionName: "tickColor", name: "Tick Color", optionType: "field", initialValue: colors[this.props.palette].axisColor},
         {optionName: "graphTitleColor", name: "Title Color", optionType: "field", initialValue: colors[this.props.palette].axisColor},
         {optionName: "labelColor", name: "Label Color", optionType: "field", initialValue: colors[this.props.palette].axisColor},

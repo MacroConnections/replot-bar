@@ -9,6 +9,8 @@ class Bar extends React.PureComponent {
 
   render() {
     let errorBar = null
+    let height = Math.max(0, this.props.height)
+    let y = Math.max(0, this.props.y)
     if (this.props.errorMinY && this.props.errorMaxY) {
       errorBar = <g>
           <line x1={this.props.errorX-5} y1={this.props.errorMinY}
@@ -26,12 +28,12 @@ class Bar extends React.PureComponent {
     return (
       <Motion
         defaultStyle={{
-          y: (this.props.initialAnimation ? this.props.chartHeight : this.props.y),
-          height: (this.props.initialAnimation ? 0 : this.props.height)
+          y: (this.props.initialAnimation ? this.props.chartHeight : y),
+          height: (this.props.initialAnimation ? 0 : height)
         }}
         style={{
-          y: spring(this.props.y, {stiffness: 100, damping: 20}),
-          height: spring(this.props.height, {stiffness: 100, damping: 20})
+          y: spring(y, {stiffness: 100, damping: 20}),
+          height: spring(height, {stiffness: 100, damping: 20})
         }}
       >
         {

@@ -8,12 +8,18 @@ class BarContainer extends React.Component {
   }
 
   render() {
+    if (this.props.data.length <= 0) {
+      return (<g></g>)
+    }
     let series = []
     let unit
     if (this.props.yScale === "log") {
       unit = this.props.height / Math.log10(this.props.max)
     } else {
       unit = this.props.height / this.props.max
+    }
+    if (unit === 0) {
+      unit = 1
     }
     let barX, barHeight, barWidth, dataPoint
 
@@ -43,6 +49,9 @@ class BarContainer extends React.Component {
               barHeight = Math.log10(dataPoint[this.props.yKey]) * unit
             } else {
               barHeight = dataPoint[this.props.yKey] * unit
+            }
+            if (isNaN(barHeight)) {
+              barHeight = 0
             }
             let errX = barX + barWidth/10 + (barWidth <= 0 ? 0 : barWidth/2)
             let errMinY = null
@@ -88,6 +97,9 @@ class BarContainer extends React.Component {
           barHeight = Math.log10(dataPoint[this.props.yKey]) * unit
         } else {
           barHeight = dataPoint[this.props.yKey] * unit
+        }
+        if (isNaN(barHeight)) {
+          barHeight = 0
         }
         let errMinY = null
         let errMaxY = null

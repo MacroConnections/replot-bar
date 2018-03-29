@@ -22,7 +22,7 @@ The only *required* input is proper JSON formatted data.
 In the simplest case, just supply data (as a Javascript array) and specify the
 keys associated with the values:
 
-![example](docs/img/bar-chart-example.png)
+![example](https://github.com/replot/replot-bar/blob/master/docs/img/bar-chart-example.png)
 
 ```javascript
 render() {
@@ -54,7 +54,7 @@ render() {
 
 You can supply the data as array of JSON objects.
 
-![example](docs/img/grouped-bar-chart-example.png)
+![example](https://github.com/replot/replot-bar/blob/master/docs/img/grouped-bar-chart-example.png)
 
 ```javascript
 render() {

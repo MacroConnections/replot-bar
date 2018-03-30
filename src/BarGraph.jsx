@@ -116,7 +116,7 @@ BarGraph.defaultProps = {
   ],
   yScale: "lin",
   errorBarColor: "#AAA",
-
+  axisWidth: 1.5,
   showXAxisLine: true,
   showYAxisLine: true,
   showGrid: true,

@@ -33,29 +33,6 @@ class BarGraph extends React.PureComponent {
 
     let colorFunc = getColorFunc(this.props.color)
     let legendValues = this.props.groupKey ? getLegendValues(xVals, colorFunc) : null
-    let axisStyle = {
-      titleColor: this.props.graphTitleColor,
-      titleFontSize: this.props.titleFontSize,
-      titleFontFamily: this.props.titleFontFamily,
-      labelColor: this.props.labelColor,
-      labelFontSize: this.props.labelFontSize,
-      labelFontFamily: this.props.labelFontFamily,
-      axisColor: this.props.axisColor,
-      lineWidth: this.props.axisWidth,
-      lineOpacity: this.props.axisOpacity,
-      gridColor: this.props.gridColor,
-      gridWidth: this.props.gridWidth,
-      gridOpacity: this.props.gridOpacity,
-      tickColor: this.props.tickColor,
-      tickWidth: this.props.tickWidth,
-      tickOpacity: this.props.tickOpacity,
-    }
-    let legendStyle = {
-      fontColor: this.props.legendFontColor,
-      backgroundColor: this.props.legendBackground,
-      showBorder: this.props.legendShowBorder,
-      borderColor: this.props.legendBorderColor,
-    }
 
     return (
       <svg width={this.props.width} height={this.props.height}>
@@ -64,11 +41,22 @@ class BarGraph extends React.PureComponent {
           yTitle={this.props.yTitle} showXAxisLine={this.props.showXAxisLine}
           showXLabels={this.props.showXLabels} showYAxisLine={this.props.showYAxisLine}
           showYLabels={this.props.showYLabels} showGrid={this.props.showGrid}
-          axisStyle={axisStyle} minY={0} maxY={maxY + padY}
+          minY={0} maxY={maxY + padY}
+          titleColor={this.props.graphTitleColor} titleFontSize={this.props.titleFontSize}
+          titleFontFamily={this.props.titleFontFamily} labelColor={this.props.labelColor}
+          labelFontSize={this.props.labelFontSize} labelFontFamily={this.props.labelFontFamily}
+          axisColor={this.props.axisColor} lineWidth={this.props.axisWidth}
+          lineOpacity={this.props.axisOpacity} gridColor={this.props.gridColor}
+          gridWidth={this.props.gridWidth} gridOpacity={this.props.gridOpacity}
+          tickColor={this.props.tickColor} tickWidth={this.props.tickWidth}
+          tickOpacity={this.props.tickOpacity}
           yScale={this.props.yScale} xAxisMode="discrete" labels={xLabels}
           legendValues={legendValues}
           legendMode={this.props.legendMode} showLegend={this.props.showLegend}
-          legendStyle={legendStyle} >
+          legendFontColor={this.props.legendFontColor}
+          legendBackgroundColor={this.props.legendBackground}
+          legendShowBorder={this.props.legendShowBorder}
+          legendBorderColor={this.props.legendBorderColor}>
           <BarContainer data={this.props.data} groupKey={this.props.groupKey}
             color={colorFunc} max={maxY+padY} xVals={xVals}
             xKey={this.props.xKey} yKey={this.props.yKey} yScale={this.props.yScale}
@@ -110,10 +98,7 @@ BarGraph.defaultProps = {
   yKey: "y",
   width: 800,
   height: 600,
-  color: [
-    "#4cab92", "#ca0004", "#8e44ad", "#eccc00",
-    "#9dbd5f", "#0097bf", "#005c7a", "#fc6000"
-  ],
+  color: ["#fea30d", "#fd7c54", "#d1638c", "#4a4cda", "#0071bb", "#1f02fa"],
   yScale: "lin",
   errorBarColor: "#AAA",
   axisWidth: 1.5,
@@ -165,11 +150,11 @@ BarGraph.propTypes = {
   showYLabels: PropTypes.bool,
   labelColor: PropTypes.string,
   labelFontSize: PropTypes.number,
-  labelFontFamily: PropTypes.number,
+  labelFontFamily: PropTypes.string,
 
   graphTitleColor: PropTypes.string,
   graphTitleFontSize: PropTypes.number,
-  graphTitleFontFamily: PropTypes.number,
+  graphTitleFontFamily: PropTypes.string,
 
   showLegend: PropTypes.bool,
   legendFontColor: PropTypes.string,

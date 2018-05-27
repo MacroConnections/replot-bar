@@ -1,4 +1,4 @@
-# Bar chart for react
+# replot-bar: Bar graphs for react
 Intelligent and customizable bar graph components for react.
 
 ## Installation
@@ -15,14 +15,12 @@ import BarGraph from 'replot-bar'
 ```
 
 ## API
-replot-bar is designed to easily create BarGraphs.
-The only *required* input is proper JSON formatted data.
+replot-bar is designed to create beautiful bar graphs right out of the box.
+The only *required* input is properly formatted data.
 
 ### Basic Usage
 In the simplest case, just supply data (as a Javascript array) and specify the
 keys associated with the values:
-
-![example](https://github.com/replot/replot-bar/blob/master/docs/img/bar-chart-example.png)
 
 ```javascript
 render() {
@@ -39,22 +37,22 @@ render() {
 
   return(
     <BarGraph data={populations}
-      xKey="country"
-      yKey="population"/>
+      	xKey="country"
+      	yKey="population"
+    />
   )
 }
 ```
 
 - `data` is the only required prop
-- `groupKey` defaults to `"group"`
 - `xKey` defaults to `"x"`
 - `yKey` defaults to `"y"`
 
+![ScreenshotBarDefault](https://github.com/replot/replot-bar/raw/master/img/basic_default.png)
+
 #### Grouped Bar Graph
 
-You can supply the data as array of JSON objects.
-
-![example](https://github.com/replot/replot-bar/blob/master/docs/img/grouped-bar-chart-example.png)
+You can supply the data as an array of JSON objects.
 
 ```javascript
 render() {
@@ -77,18 +75,35 @@ render() {
 
   return(
     <BarGraph data={populations}
-      xKey="year"
-      yKey="weight"
-      groupKey="country"/>
+      	xKey="year"
+      	yKey="weight"
+      	groupKey="country"
+    />
   )
 }
 ```
 
-- `groupKey` is number or string.
+- `groupKey` defaults to `"group"`
+
+![ScreenshotGroupedBar](https://github.com/replot/replot-bar/raw/master/img/default.png)
 
 ### Dimensions
-Dimensions may be specified by passing in `width` and `height` props. The
-unit is pixels, and the BarGraph defaults to 800 by 600 pixels.
+Dimensions may be specified by passing in `width` and `height` props with numbers
+in the unit of pixels.
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	width={600}
+      	height={450}
+    />
+  )
+}
+```
+
+- `width` defaults to `800`
+- `height` defaults to `600`
 
 Width dimensions may also be specified with a string, as a percentage. The width
 will then be calculated as a proportion of the parent container.
@@ -96,10 +111,73 @@ will then be calculated as a proportion of the parent container.
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} width="50%" height="200px" />
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+        width="50%"
+        height={450}
+    />
   )
 }
 ```
+
+ Default                   | width={600} height={450}  | width="50%" height={450}        
+:-------------------------:|:-------------------------:|:-------------------------:
+![ScreenshotDefaultDimensions](https://github.com/replot/replot-bar/raw/master/img/dim_default.png) | ![ScreenshotWidth600pxHeight450px](https://github.com/replot/replot-bar/raw/master/img/w600_h450.png) | ![ScreenshotWidth50%Height450px](https://github.com/replot/replot-bar/raw/master/img/w50_percent.png)
+
+### Error Bars
+Error bars may be displayed by passing in `errorBarMinKey` and `errorBarMaxKey` props with the
+keys associated with the error ranges.
+
+```javascript
+let estimates = [
+  {weight: 1379, min_weight: 1300, max_weight: 1400, country: "China", year: 2016},
+  {weight: 1371, min_weight: 1300, max_weight: 1400, country: "China", year: 2015},
+  {weight: 1364, min_weight: 1300, max_weight: 1400, country: "China", year: 2014},
+  {weight: 1357, min_weight: 1200, max_weight: 1300, country: "China", year: 2013},
+  {weight: 1351, min_weight: 1200, max_weight: 1300, country: "China", year: 2012},
+  {weight: 1344, min_weight: 1200, max_weight: 1300, country: "China", year: 2011},
+  {weight: 1338, min_weight: 1200, max_weight: 1300, country: "China", year: 2010},
+  {weight: 323, min_weight: 300, max_weight: 400, country: "United States", year: 2016},
+  {weight: 321, min_weight: 300, max_weight: 400, country: "United States", year: 2015},
+  {weight: 319, min_weight: 250, max_weight: 350, country: "United States", year: 2014},
+  {weight: 316, min_weight: 250, max_weight: 350, country: "United States", year: 2013},
+  {weight: 314, min_weight: 250, max_weight: 350, country: "United States", year: 2012},
+  {weight: 312, min_weight: 250, max_weight: 350, country: "United States", year: 2011},
+  {weight: 309, min_weight: 200, max_weight: 300, country: "United States", year: 2010}
+]
+
+render() {
+  return(
+    <BarGraph data={estimates} xKey="year" yKey="weight" groupKey="country"
+      	errorBarMaxKey="max_weight"
+	errorBarMinKey="min_weight"
+    />
+  )
+}
+```
+
+- `errorBarMaxKey` is unspecified by default
+- `errorBarMinKey` is unspecified by default
+
+Color of error bars may also be specified by passing in `errorBarColor` prop with a color string.
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	errorBarMaxKey="max_weight"
+	errorBarMinKey="min_weight"
+	errorBarColor="#ff0000"
+    />
+  )
+}
+```
+
+- `errorBarColor` defaults to `"#AAA"`
+
+ Default                   | Error Bars  | errorBarColor="#ff0000"      
+:-------------------------:|:-------------------------:|:-------------------------:
+![ScreenshotBarDefault](https://github.com/replot/replot-bar/raw/master/img/default.png) | ![ScreenshotErrorBars](https://github.com/replot/replot-bar/raw/master/img/error_bars.png) | ![ScreenshotErrorBarColor](https://github.com/replot/replot-bar/raw/master/img/error_bar_color.png)
+
 
 ### Colors
 Colors may be specified through 2 different mechanisms, both through a `color` prop.
@@ -117,7 +195,9 @@ render() {
   ]
 
   return(
-    <BarGraph data={populations} color={colors} />
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country" 
+      	color={colors}
+    />
   )
 }
 ```
@@ -126,8 +206,7 @@ render() {
 Users can also specify a function to assign colors to different bars. Expected arguments to the function are the index of the bar (from 0), its corresponding x-value, and its group (if it exists).
 
 ```javascript
-
-colorMe(i, value, group) {
+let colorMe = (i, value, group) => {
   if (group === "USA"){
     return "red"
   } else if (group === "China") {
@@ -137,47 +216,16 @@ colorMe(i, value, group) {
 
 render() {
   return(
-    <BarGraph data={populations} color={this.colorMe} />
-  )
-}
-```
-
-### Tooltip
-Tooltips can display more specific information about a bar.
-
-```javascript
-render() {
-  return(
-    <BarGraph data={populations} tooltip="true" tooltipColor="dark" />
-  )
-}
-```
-
-- `tooltip` defaults to `true`, `false` turns the tooltip off
-- `tooltipColor` defaults to `light`, it can be set to `light` or `dark`
-- `tooltipContents` defaults to the x-value, y-value, and group for a bar
-
-#### User-provided Tooltip Function
-Users can customize what is displayed inside the tooltip with a function. Expected arguments to the function are the data for the specific point hovered over and an array of data for the line hovered over. The function should return JSX.
-
-```javascript
-fillTooltip(data) {
-  return (
-    <div>
-      <span>This bar is made with this data: {data}</span>
-    </div>
-  )
-}
-
-render() {
-  return(
-    <BarGraph data={populations} tooltipContents={this.fillTooltip} />
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	color={colorMe}
+    />
   )
 }
 ```
 
 ### Axis Customization
-Users can customize graph axes in several different ways.
+Replot BarGraphs allow for incredible customization of the graph axis. A complete
+explanation of axis customization can be found below:
 
 #### Titles
 Title props accept strings to display in the appropriate location on the graph. To compensate for the inclusion of a title, graph content will be condensed, but the overall size of the component will stay constant.
@@ -189,13 +237,17 @@ Title props accept strings to display in the appropriate location on the graph. 
 ```javascript
 render() {
   return(
-    <BarGraph data={populations}
-      graphTitle="Annual Population in the US and China"
-      xTitle="Year"
-      yTitle="Population" />
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    	graphTitle="Annual Population in the US and China"
+      	xTitle="Year"
+      	yTitle="Population" />
   )
 }
 ```
+
+Default | Custom titles
+:-------------------------:|:-------------------------:
+![ScreenshotBarDefault](https://github.com/replot/replot-bar/raw/master/img/default.png) | ![ScreenshotGraphTitles](https://github.com/replot/replot-bar/raw/master/img/graph_titles.png)
 
 #### Displaying Axis Elements
 Users can customize the display of the lines, labels, and gridlines of the axes.
@@ -206,83 +258,315 @@ Users can customize the display of the lines, labels, and gridlines of the axes.
 - `showYLabels`: defaults to `true`, controls display of labels on the y-axis
 - `showGrid`: defaults to `true`, controls display of gridlines
 
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	showXAxisLine={false}
+	showYAxisLine={false}
+	showXLabels={false}
+	showYLabels={false}
+	showGrid={false}
+    />
+  )
+}
+```
+
+Lines hidden | Labels hidden
+:-------------------------:|:-------------------------:
+![ScreenshotLinesHidden](https://github.com/replot/replot-bar/raw/master/img/lines_hidden.png) | ![ScreenshotLabelsHidden](https://github.com/replot/replot-bar/raw/master/img/labels_hidden.png)
+
 #### Axis Scale
 Users can control the scale of the graph, linear or logarithmic. Users can also control the number of increments on the y-axis.
 
 - `yScale`: defaults to `"lin"` for linear scale, can be `"log"` for logarithmic scale
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	yScale="log"
+    />
+  )
+}
+```
+
 - `ySteps`: defaults to 1 division per 100 pixels, accepts a number given by the user
 
-#### Axis Style
-Users can customize axis style by passing a javascript object to the `axisStyle` argument. Keys can include:
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	ySteps={20}
+    />
+  )
+}
+```
 
-* axisColor
-  * modifies the color of the axis line
-  * defaults to `#000000`
+yScale="log" | yStep={20}
+:-------------------------:|:-------------------------:
+![ScreenshotScaleLog](https://github.com/replot/replot-bar/raw/master/img/scale_log.png) | ![ScreenshotSteps200](https://github.com/replot/replot-bar/raw/master/img/steps_20.png)
+
+#### Axis Style
+Users can customize the axis style by passing in the prop(s) below:
+
+* `axisColor`
+  * modifies the color of axis lines
+  * defaults to `"#AAA"`
   * accepts any color string
-* labelColor
-  * modifies the color of both axis labels
-  * defaults to `#000000`
+* `tickColor`
+  * modifies the color of axis ticks
+  * defaults to `"#AAA"`
   * accepts any color string
-* titleColor
-  * modifies the color of all graph titles
-  * defaults to `#000000`
-  * accepts any color string
-* labelColor
+* `gridColor`
   * modifies the color of axis gridlines
-  * defaults to `#DDDDDD`
+  * defaults to `"#AAA"`
   * accepts any color string
-* lineWidth
+* `labelColor`
+  * modifies the color of both axis labels
+  * defaults to `"#AAA"`
+  * accepts any color string
+* `graphTitleColor`
+  * modifies the color of all graph titles
+  * defaults to `"#AAA"`
+  * accepts any color string
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	axisColor="#ff0000"
+	tickColor="#ff0000"
+	gridColor="#ff0000"
+	labelColor="#ff0000"
+	graphTitleColor="#ff0000"
+    />
+  )
+}
+```
+
+* `axisWidth`
   * modifies the thickness of axis lines
-  * defaults to `2`
+  * defaults to `1.5`
   * accepts any number
-* lineOpacity
-  * modifies the opacity of axis lines
+* `tickWidth`
+  * modifies the thickness of axis ticks
+  * defaults to `1.5`
+  * accepts any number
+* `gridWidth`
+  * modifies the thickness of axis gridlines
   * defaults to `1`
   * accepts any number
 
 ```javascript
-let style = {
-  axisColor: "#f17e33",
-  labelColor: "blue",
-  titleColor: "#000000",
-  gridColor: "#DDDDDD",
-  lineWidth: 5,
-  lineOpacity: .5
-}
-
 render() {
   return(
-    <BarGraph data={populations} axisStyle={style} />
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	axisWidth={5}
+	tickWidth={5}
+	gridWidth={5}
+    />
   )
 }
 ```
+
+* `axisOpacity`
+  * modifies the opacity of axis lines
+  * defaults to `1`
+  * accepts any number
+* `tickOpacity`
+  * modifies the opacity of axis ticks
+  * defaults to `1`
+  * accepts any number
+* `gridOpacity`
+  * modifies the opacity of axis gridlines
+  * defaults to `0.5`
+  * accepts any number
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+      	axisOpacity={0.2}
+	tickOpacity={0.2}
+	gridOpacity={0.2}
+    />
+  )
+}
+```
+
+ Custom colors             | Custom widths             | Custom opacities        
+:-------------------------:|:-------------------------:|:-------------------------:
+![ScreenshotAxisColors](https://github.com/replot/replot-bar/raw/master/img/axis_colors.png) | ![ScreenshotAxisWidths](https://github.com/replot/replot-bar/raw/master/img/axis_widths.png) | ![ScreenshotAxisOpacities](https://github.com/replot/replot-bar/raw/master/img/axis_opacities.png)
+
+* `labelFontSize`
+  * sets the font size of both axis labels
+  * automatically calculated when unspecified
+  * accepts any number
+* `graphTitleFontSize`
+  * sets the font size of all graph titles
+  * automatically calculated when unspecified
+  * accepts any number
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+        labelFontSize={8}
+    	graphTitleFontSize={10}
+    />
+  )
+}
+```
+
+* `labelFontFamily`
+  * sets the font family of both axis labels
+  * inherits when unspecified
+  * accepts any font family name string
+* `graphTitleFontFamily`
+  * sets the font family of all graph titles
+  * inherits when unspecified
+  * accepts any font family name string
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+	labelFontFamily="Courier"
+	graphTitleFontFamily="Courier"
+    />
+  )
+}
+```
+
+ Custom font sizes | Custom font families
+:-------------------------:|:-------------------------:
+![ScreenshotAxisFontSizes](https://github.com/replot/replot-bar/raw/master/img/axis_font_sizes.png) | ![ScreenshotAxisFontFamilies](https://github.com/replot/replot-bar/raw/master/img/axis_font_families.png)
 
 ### Legend Customization
 Users can customize the graph legend in several ways.
 
 - `showLegend`: defaults to `true` if there is a group key, controls display of the legend
 
-#### Legend Style
-Users can customize legend style by passing a javascript object to the `legendStyle` argument. Keys can include:
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+	showLegend={false}
+    />
+  )
+}
+```
 
-* fontColor
+ Default | showLegend={false}
+:-------------------------:|:-------------------------:
+![ScreenshotBarDefault](https://github.com/replot/replot-bar/raw/master/img/default.png) | ![ScreenshotLegendHidden](https://github.com/replot/replot-bar/raw/master/img/legend_hidden.png)
+
+
+#### Legend Style
+Users can customize the legend style by passing in the prop(s) below:
+
+* `legendFontColor`
 	* Modifies the color of the font used in the legend
-	* Defaults to `"#000000"`
+	* Defaults to `"#AAA"`
 	* Accepts any color string
-* backgroundColor
+* `legendBackground`
 	* Modifies the background color of the legend
 	* Defaults to `"none"`
 	* Accepts any color string
-* showBorder
+* `legendShowBorder`
  	* Determines whether a border will be drawn around the legend
-	* Defaults to `true`
+	* Defaults to `false`
 	* Accepts `true` or `false`
-* borderColor
+* `legendBorderColor`
 	* Modifies the color of the border of the legend
-	* Defaults to `"#000000"`
+	* Defaults to `"#AAA"`
 	* Accepts any color string
 
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+	legendFontColor="#ff0000"
+	legendBackground="#ffffff"
+	legendShowBorder={true}
+	legendBorderColor="#ff0000"
+    />
+  )
+}
+```
+
+ Default | Custom Style
+:-------------------------:|:-------------------------:
+![ScreenshotBarDefault](https://github.com/replot/replot-bar/raw/master/img/default.png) | ![ScreenshotLegendStyle](https://github.com/replot/replot-bar/raw/master/img/legend_style.png)
+
+* `legendFontSize`
+  * sets the font size of legend texts
+  * automatically calculated when unspecified
+  * accepts any number
+* `legendFontFamily`
+  * sets the font family of legend texts
+  * inherits when unspecified
+  * accepts any font family name string
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+  	legendFontSize={10}
+  	legendFontFamily="Courier"
+    />
+  )
+}
+```
+
+ Default                   | legendFontSize={10}       | legendFontFamily="Courier"
+:-------------------------:|:-------------------------:|:-------------------------:
+![ScreenshotBarDefault](https://github.com/replot/replot-bar/raw/master/img/default.png) | ![ScreenshotLegendFontSize](https://github.com/replot/replot-bar/raw/master/img/legend_font_size.png) | ![ScreenshotLegendFontFamily](https://github.com/replot/replot-bar/raw/master/img/legend_font_family.png)
+
+### Tooltip
+Tooltips can display more specific information about a data series.
+
+```javascript
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+	tooltip={false}
+	tooltipColor="light"
+    />
+  )
+}
+```
+
+- `tooltip` defaults to `true`, `false` turns the tooltip off
+- `tooltipColor` defaults to `dark`, it can be set to `light` or `dark`
+
+ Default tooltip             | tooltipColor="light"          | tooltip={false}   
+:-------------------------:|:-------------------------:|:-------------------------:
+![ScreenshotTooltipDefault](https://github.com/replot/replot-bar/raw/master/img/tooltip_dark.png) | ![ScreenshotTooltipLight](https://github.com/replot/replot-bar/raw/master/img/tooltip_light.png) | ![ScreenshotTooltipHidden](https://github.com/replot/replot-bar/raw/master/img/default.png)
+
+#### User-provided Tooltip Function
+Users can customize what is displayed inside the tooltip with a function. Expected arguments to the function are the data for the specific bar hovered over. The function should return JSX.
+
+```javascript
+let fillTooltip = (data) => {
+  return(
+    <span>The data for this bar looks like {JSON.stringify(data)}</span>
+  )
+}
+
+render() {
+  return(
+    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+	tooltipContents={fillTooltip}
+    />
+  )
+}
+```
+
+![ScreenshotTooltipCustom](https://github.com/replot/replot-bar/raw/master/img/tooltip_custom.png)
+
 ### Animation Customization
-Users can control the initial animation of the graph, bars growing out from the y-axis line.
+Users can control the initial animation of the graph, bars growing out from the x-axis line.
 
 - `initialAnimation`: defaults to `true`, controls the animation

@@ -25,14 +25,11 @@ keys associated with the values:
 ```javascript
 render() {
   let populations = [
-    {population: 1373, country: "China"},
-    {population: 1266, country: "India"},
-    {population: 323, country: "United States"},
-    {population: 958, country: "Indonesia"},
-    {population: 805, country: "Brazil"},
-    {population: 501, country: "Pakistan"},
-    {population: 786, country: "Nigeria"},
-    {population: 456, country: "Bangladesh"}
+    {country: "Github", year: 2017, population: 2400000},
+    {country: "Netherlands", year: 2017, population: 1703500},
+    {country: "Israel", year: 2017, population: 832100},
+    {country: "New Zealand", year: 2017, population: 470500},
+    {country: "Iceland", year: 2017, population: 33500}
   ]
 
   return(
@@ -57,26 +54,27 @@ You can supply the data as an array of JSON objects.
 ```javascript
 render() {
   let populations = [
-    {weight: 1379, country: "China", year: 2016},
-    {weight: 1371, country: "China", year: 2015},
-    {weight: 1364, country: "China", year: 2014},
-    {weight: 1357, country: "China", year: 2013},
-    {weight: 1351, country: "China", year: 2012},
-    {weight: 1344, country: "China", year: 2011},
-    {weight: 1338, country: "China", year: 2010},
-    {weight: 323, country: "United States", year: 2016},
-    {weight: 321, country: "United States", year: 2015},
-    {weight: 319, country: "United States", year: 2014},
-    {weight: 316, country: "United States", year: 2013},
-    {weight: 314, country: "United States", year: 2012},
-    {weight: 312, country: "United States", year: 2011},
-    {weight: 309, country: "United States", year: 2010}
+    {country: "Github", year: 2015, population: 1100000},
+    {country: "Github", year: 2016, population: 1600000},
+    {country: "Github", year: 2017, population: 2400000},
+    {country: "Netherlands", year: 2015, population: 1692500},
+    {country: "Netherlands", year: 2016, population: 1698700},
+    {country: "Netherlands", year: 2017, population: 1703500},
+    {country: "Israel", year: 2015, population: 806400},
+    {country: "Israel", year: 2016, population: 819100},
+    {country: "Israel", year: 2017, population: 832100},
+    {country: "New Zealand", year: 2015, population: 452900},
+    {country: "New Zealand", year: 2016, population: 466000},
+    {country: "New Zealand", year: 2017, population: 470500},
+    {country: "Iceland", year: 2015, population: 32900},
+    {country: "Iceland", year: 2016, population: 33200},
+    {country: "Iceland", year: 2017, population: 33500}
   ]
 
   return(
     <BarGraph data={populations}
       	xKey="year"
-      	yKey="weight"
+      	yKey="population"
       	groupKey="country"
     />
   )
@@ -94,7 +92,7 @@ in the unit of pixels.
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
       	width={600}
       	height={450}
     />
@@ -111,7 +109,7 @@ will then be calculated as a proportion of the parent container.
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
         width="50%"
         height={450}
     />
@@ -128,28 +126,29 @@ Error bars may be displayed by passing in `errorBarMinKey` and `errorBarMaxKey` 
 keys associated with the error ranges.
 
 ```javascript
-let estimates = [
-  {weight: 1379, min_weight: 1300, max_weight: 1400, country: "China", year: 2016},
-  {weight: 1371, min_weight: 1300, max_weight: 1400, country: "China", year: 2015},
-  {weight: 1364, min_weight: 1300, max_weight: 1400, country: "China", year: 2014},
-  {weight: 1357, min_weight: 1200, max_weight: 1300, country: "China", year: 2013},
-  {weight: 1351, min_weight: 1200, max_weight: 1300, country: "China", year: 2012},
-  {weight: 1344, min_weight: 1200, max_weight: 1300, country: "China", year: 2011},
-  {weight: 1338, min_weight: 1200, max_weight: 1300, country: "China", year: 2010},
-  {weight: 323, min_weight: 300, max_weight: 400, country: "United States", year: 2016},
-  {weight: 321, min_weight: 300, max_weight: 400, country: "United States", year: 2015},
-  {weight: 319, min_weight: 250, max_weight: 350, country: "United States", year: 2014},
-  {weight: 316, min_weight: 250, max_weight: 350, country: "United States", year: 2013},
-  {weight: 314, min_weight: 250, max_weight: 350, country: "United States", year: 2012},
-  {weight: 312, min_weight: 250, max_weight: 350, country: "United States", year: 2011},
-  {weight: 309, min_weight: 200, max_weight: 300, country: "United States", year: 2010}
-]
-
 render() {
+  let estimates = [
+    {country: "Github", year: 2015, population: 1100000, max: 1200000, min: 1000000},
+    {country: "Github", year: 2016, population: 1600000, max: 1700000, min: 1500000},
+    {country: "Github", year: 2017, population: 2400000, max: 2500000, min: 2300000},
+    {country: "Netherlands", year: 2015, population: 1692500, max: 1800000, min: 1600000},
+    {country: "Netherlands", year: 2016, population: 1698700, max: 1800000, min: 1600000},
+    {country: "Netherlands", year: 2017, population: 1703500, max: 1800000, min: 1600000},
+    {country: "Israel", year: 2015, population: 806400, max: 900000, min: 700000},
+    {country: "Israel", year: 2016, population: 819100, max: 900000, min: 700000},
+    {country: "Israel", year: 2017, population: 832100, max: 900000, min: 700000},
+    {country: "New Zealand", year: 2015, population: 452900, max: 550000, min: 450000},
+    {country: "New Zealand", year: 2016, population: 466000, max: 550000, min: 450000},
+    {country: "New Zealand", year: 2017, population: 470500, max: 550000, min: 450000},
+    {country: "Iceland", year: 2015, population: 32900, max: 35000, min: 32000},
+    {country: "Iceland", year: 2016, population: 33200, max: 35000, min: 32000},
+    {country: "Iceland", year: 2017, population: 33500, max: 35000, min: 32000}
+  ]
+
   return(
-    <BarGraph data={estimates} xKey="year" yKey="weight" groupKey="country"
-      	errorBarMaxKey="max_weight"
-	errorBarMinKey="min_weight"
+    <BarGraph data={estimates} xKey="year" yKey="population" groupKey="country"
+      	errorBarMaxKey="max"
+	errorBarMinKey="min"
     />
   )
 }
@@ -163,9 +162,9 @@ Color of error bars may also be specified by passing in `errorBarColor` prop wit
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
-      	errorBarMaxKey="max_weight"
-	errorBarMinKey="min_weight"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
+      	errorBarMaxKey="max"
+	errorBarMinKey="min"
 	errorBarColor="#ff0000"
     />
   )
@@ -195,7 +194,7 @@ render() {
   ]
 
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country" 
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country" 
       	color={colors}
     />
   )
@@ -207,16 +206,16 @@ Users can also specify a function to assign colors to different bars. Expected a
 
 ```javascript
 let colorMe = (i, value, group) => {
-  if (group === "USA"){
+  if (group === "Github"){
     return "red"
-  } else if (group === "China") {
-    return "blue"
+  } else {
+    return "grey"
   }
 }
 
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
       	color={colorMe}
     />
   )
@@ -237,7 +236,7 @@ Title props accept strings to display in the appropriate location on the graph. 
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
     	graphTitle="Annual Population in the US and China"
       	xTitle="Year"
       	yTitle="Population" />
@@ -261,7 +260,7 @@ Users can customize the display of the lines, labels, and gridlines of the axes.
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
       	showXAxisLine={false}
 	showYAxisLine={false}
 	showXLabels={false}
@@ -284,7 +283,7 @@ Users can control the scale of the graph, linear or logarithmic. Users can also 
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
       	yScale="log"
     />
   )
@@ -296,7 +295,7 @@ render() {
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
       	ySteps={20}
     />
   )
@@ -334,7 +333,7 @@ Users can customize the axis style by passing in the prop(s) below:
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
       	axisColor="#ff0000"
 	tickColor="#ff0000"
 	gridColor="#ff0000"
@@ -361,7 +360,7 @@ render() {
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
       	axisWidth={5}
 	tickWidth={5}
 	gridWidth={5}
@@ -386,7 +385,7 @@ render() {
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
       	axisOpacity={0.2}
 	tickOpacity={0.2}
 	gridOpacity={0.2}
@@ -411,7 +410,7 @@ render() {
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
         labelFontSize={8}
     	graphTitleFontSize={10}
     />
@@ -431,7 +430,7 @@ render() {
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
 	labelFontFamily="Courier"
 	graphTitleFontFamily="Courier"
     />
@@ -451,7 +450,7 @@ Users can customize the graph legend in several ways.
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
 	showLegend={false}
     />
   )
@@ -486,7 +485,7 @@ Users can customize the legend style by passing in the prop(s) below:
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
 	legendFontColor="#ff0000"
 	legendBackground="#ffffff"
 	legendShowBorder={true}
@@ -512,7 +511,7 @@ render() {
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
   	legendFontSize={10}
   	legendFontFamily="Courier"
     />
@@ -530,7 +529,7 @@ Tooltips can display more specific information about a data series.
 ```javascript
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
 	tooltip={false}
 	tooltipColor="light"
     />
@@ -557,7 +556,7 @@ let fillTooltip = (data) => {
 
 render() {
   return(
-    <BarGraph data={populations} xKey="year" yKey="weight" groupKey="country"
+    <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
 	tooltipContents={fillTooltip}
     />
   )

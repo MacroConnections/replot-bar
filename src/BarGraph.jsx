@@ -54,6 +54,8 @@ class BarGraph extends React.PureComponent {
           legendValues={legendValues}
           legendMode={this.props.legendMode} showLegend={this.props.showLegend}
           legendFontColor={this.props.legendFontColor}
+          legendFontSize={this.props.legendFontSize}
+          legendFontFamily={this.props.legendFontFamily}
           legendBackgroundColor={this.props.legendBackground}
           legendShowBorder={this.props.legendShowBorder}
           legendBorderColor={this.props.legendBorderColor}>
@@ -158,6 +160,8 @@ BarGraph.propTypes = {
 
   showLegend: PropTypes.bool,
   legendFontColor: PropTypes.string,
+  legendFontSize: PropTypes.number,
+  legendFontFamily: PropTypes.string,
   legendBackground: PropTypes.string,
   legendShowBorder: PropTypes.bool,
   legendBorderColor: PropTypes.string,

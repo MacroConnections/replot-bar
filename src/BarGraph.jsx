@@ -42,8 +42,8 @@ class BarGraph extends React.PureComponent {
           showXLabels={this.props.showXLabels} showYAxisLine={this.props.showYAxisLine}
           showYLabels={this.props.showYLabels} showGrid={this.props.showGrid}
           minY={0} maxY={maxY + padY}
-          titleColor={this.props.graphTitleColor} titleFontSize={this.props.titleFontSize}
-          titleFontFamily={this.props.titleFontFamily} labelColor={this.props.labelColor}
+          titleColor={this.props.graphTitleColor} titleFontSize={this.props.graphTitleFontSize}
+          titleFontFamily={this.props.graphTitleFontFamily} labelColor={this.props.labelColor}
           labelFontSize={this.props.labelFontSize} labelFontFamily={this.props.labelFontFamily}
           axisColor={this.props.axisColor} lineWidth={this.props.axisWidth}
           lineOpacity={this.props.axisOpacity} gridColor={this.props.gridColor}

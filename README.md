@@ -206,7 +206,7 @@ Users can also specify a function to assign colors to different bars. Expected a
 
 ```javascript
 let colorMe = (i, value, group) => {
-  if (group === "Github"){
+  if (value === "Github"){
     return "red"
   } else {
     return "grey"
@@ -221,6 +221,10 @@ render() {
   )
 }
 ```
+
+color={colors} | color={colorMe}   
+:-------------------------:|:-------------------------:
+![ScreenshotColorArray](https://github.com/replot/replot-bar/raw/master/img/color_array.png) | ![ScreenshotColorFunction](https://github.com/replot/replot-bar/raw/master/img/color_func.png)
 
 ### Axis Customization
 Replot BarGraphs allow for incredible customization of the graph axis. A complete
@@ -237,7 +241,7 @@ Title props accept strings to display in the appropriate location on the graph. 
 render() {
   return(
     <BarGraph data={populations} xKey="year" yKey="population" groupKey="country"
-    	graphTitle="Annual Population in the US and China"
+    	graphTitle="Population by Country"
       	xTitle="Year"
       	yTitle="Population" />
   )
@@ -550,7 +554,7 @@ Users can customize what is displayed inside the tooltip with a function. Expect
 ```javascript
 let fillTooltip = (data) => {
   return(
-    <span>The data for this bar looks like {JSON.stringify(data)}</span>
+    <span>The country for this bar is {data.country}</span>
   )
 }
 

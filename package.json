@@ -24,19 +24,21 @@
     "url": "https://github.com/replot/replot-bar/issues"
   },
   "homepage": "https://github.com/replot/replot-bar#readme",
-  "dependencies": {
+  "devDependencies": {
     "babel-core": "^6.23.1",
     "babel-loader": "^6.3.2",
     "babel-preset-es2015": "^6.22.0",
     "babel-preset-react": "^6.23.0",
     "eslint": "^3.16.1",
     "eslint-plugin-react": "^6.10.0",
-    "prop-types": "^15.5.10",
     "radium": "^0.21.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-motion": "^0.5.2",
-    "replot-core": "^0.2.1",
     "webpack": "^2.2.1"
+  },
+  "dependencies": {
+    "prop-types": "^15.6.0",
+    "react-motion": "^0.5.2",
+    "replot-core": "^0.2.1"
   }
 }

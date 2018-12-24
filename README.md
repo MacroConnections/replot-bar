@@ -14,11 +14,10 @@ modules, use as you would anything else.
 import BarGraph from 'replot-bar'
 ```
 
-## API
+## Quick Start
 replot-bar is designed to create beautiful bar graphs right out of the box.
 The only *required* input is properly formatted data.
 
-### Basic Usage
 In the simplest case, just supply data (as a Javascript array) and specify the
 keys associated with the values:
 
@@ -47,7 +46,7 @@ render() {
 
 ![ScreenshotBarDefault](https://github.com/replot/replot-bar/raw/master/img/basic_default.png)
 
-#### Grouped Bar Graph
+### Grouped Bar Graph
 
 You can supply the data as an array of JSON objects.
 
@@ -84,6 +83,8 @@ render() {
 - `groupKey` defaults to `"group"`
 
 ![ScreenshotGroupedBar](https://github.com/replot/replot-bar/raw/master/img/default.png)
+
+## API
 
 ### Dimensions
 Dimensions may be specified by passing in `width` and `height` props with numbers
